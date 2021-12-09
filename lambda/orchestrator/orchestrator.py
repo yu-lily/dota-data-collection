@@ -1,7 +1,5 @@
 import json
 from logging import exception
-
-from aws_cdk.aws_lambda import Function
 import boto3
 import base64
 import os

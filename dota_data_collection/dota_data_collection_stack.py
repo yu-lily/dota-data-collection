@@ -37,7 +37,7 @@ class DotaDataCollectionStack(cdk.Stack):
         
         # Create a Lambda function
         update_players_lambda = PythonFunction(self, "UpdatePlayersLambda",
-                                                    runtime=_lambda.Runtime.PYTHON_3_7,
+                                                    runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/update_players',
                                                     index='update_players.py',
                                                     handler='handler',
@@ -51,7 +51,7 @@ class DotaDataCollectionStack(cdk.Stack):
                                                     timeout=core.Duration.minutes(10),
                                                 )
         queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
-                                                    runtime=_lambda.Runtime.PYTHON_3_7,
+                                                    runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/queue_players',
                                                     index='queue_players.py',
                                                     handler='handler',

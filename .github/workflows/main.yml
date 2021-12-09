@@ -41,7 +41,7 @@ jobs:
       - name: Run CDK Deploy
         run: |
           pip install --ignore-installed -r requirements.txt
-          cdk deploy dota-data-collection
+          cdk deploy --require-approval never
         
 #       - name: cdk diff
 #         uses: yu-lily/aws-cdk-github-actions@v2

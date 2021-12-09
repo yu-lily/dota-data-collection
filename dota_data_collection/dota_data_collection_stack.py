@@ -49,6 +49,7 @@ class DotaDataCollectionStack(cdk.Stack):
                                                         "DDB_ENDPOINT": "http://localhost:8000"
                                                     },
                                                     timeout=core.Duration.minutes(10),
+                                                    profiling=True,
                                                 )
         queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
@@ -63,6 +64,7 @@ class DotaDataCollectionStack(cdk.Stack):
                                                         "DDB_ENDPOINT": "http://localhost:8000"
                                                     },
                                                     timeout=core.Duration.minutes(10),
+                                                    profiling=True,
                                                 )
         
         players_table.grant_read_write_data(update_players_lambda)

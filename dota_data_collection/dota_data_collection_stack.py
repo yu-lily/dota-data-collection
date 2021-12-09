@@ -30,7 +30,8 @@ class DotaDataCollectionStack(cdk.Stack):
         # Create a DynamoDB table
         players_table = ddb.Table(self, "PlayersTable",
                                     partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
-                                )#billing_mode=ddb.BillingMode.PAY_PER_REQUEST)
+                                    billing_mode=ddb.BillingMode.PAY_PER_REQUEST
+                                )
         match_table = ddb.Table(self, "MatchTable",
                                     partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
                                 )

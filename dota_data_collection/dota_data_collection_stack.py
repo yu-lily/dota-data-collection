@@ -64,3 +64,4 @@ class DotaDataCollectionStack(cdk.Stack):
                                                 )
         
         players_table.grant_read_write_data(update_players_lambda)
+        stratz_apikey.grant_read(update_players_lambda)

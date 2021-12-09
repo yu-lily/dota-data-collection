@@ -26,9 +26,11 @@ def get_apikey():
     if 'SecretString' in get_secret_value_response:
         secret = get_secret_value_response['SecretString']
     else:
+        print("Decoded from binary")
         decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
         secret = decoded_binary_secret
     
+    print(secret[:50])
     return secret['apikey']
 
 def query_leaderboard(region):

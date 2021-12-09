@@ -45,7 +45,8 @@ def query_leaderboard(region):
     # lastUpdateDateTime
     # rank
     # rankShift
-
+    
+    print(get_apikey()[:10])
     variables = {'region': region}
     headers = {'Authorization': 'Bearer ' + get_apikey()}
     r = requests.post(endpoint, json={'query': query , 'variables': variables}, headers=headers)
@@ -53,6 +54,7 @@ def query_leaderboard(region):
         return json.loads(r.text)['data']['leaderboard']['season']
     else:
         print(f"Query failed with status code: {r.status_code}")
+        print(f"Response: {r.text}")
 
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))

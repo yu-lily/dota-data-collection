@@ -30,8 +30,8 @@ def get_apikey():
         decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
         secret = decoded_binary_secret
     
-    print(secret[:50])
-    return secret['apikey']
+    
+    return json.lodas(secret)['apikey']
 
 def query_leaderboard(region):
     endpoint = "https://api.stratz.com/graphql/"
@@ -48,7 +48,6 @@ def query_leaderboard(region):
     # rank
     # rankShift
     
-    print(get_apikey()[:10])
     variables = {'region': region}
     headers = {'Authorization': 'Bearer ' + get_apikey()}
     r = requests.post(endpoint, json={'query': query , 'variables': variables}, headers=headers)

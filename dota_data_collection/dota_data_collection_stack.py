@@ -22,7 +22,7 @@ class DotaDataCollectionStack(cdk.Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # Handle Stratz API Key
-        stratz_apikey = sm.Secret.from_secret_name_v2(self, "stratz/apikey")
+        stratz_apikey = sm.Secret.from_secret_name_v2(self, secret_name="stratz/apikey")
         stratz_api_caller = iam.Role(self, 'StratzAPICaller',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
         stratz_apikey.grant_read(stratz_api_caller)

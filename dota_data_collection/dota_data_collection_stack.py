@@ -47,7 +47,8 @@ class DotaDataCollectionStack(cdk.Stack):
                                                         "SORT_KEY": "player_name",
                                                         "DDB_REGION": "us-east-1",
                                                         "DDB_ENDPOINT": "http://localhost:8000"
-                                                    }
+                                                    },
+                                                    timeout=core.Duration.minutes(10),
                                                 )
         queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_7,
@@ -60,7 +61,8 @@ class DotaDataCollectionStack(cdk.Stack):
                                                         "SORT_KEY": "player_name",
                                                         "DDB_REGION": "us-east-1",
                                                         "DDB_ENDPOINT": "http://localhost:8000"
-                                                    }
+                                                    },
+                                                    timeout=core.Duration.minutes(10),
                                                 )
         
         players_table.grant_read_write_data(update_players_lambda)

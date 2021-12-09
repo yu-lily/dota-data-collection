@@ -30,8 +30,7 @@ def get_apikey():
         decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
         secret = decoded_binary_secret
     
-    
-    return json.lodas(secret)['apikey']
+    return json.loads(secret)['apikey']
 
 def query_leaderboard(region):
     endpoint = "https://api.stratz.com/graphql/"

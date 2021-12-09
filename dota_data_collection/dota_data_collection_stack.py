@@ -66,7 +66,7 @@ class DotaDataCollectionStack(cdk.Stack):
                                                     profiling=True,
                                                 )
 
-        orchestrator_lambda = _lambda.Function(self, "OrchestratorLambda",
+        orchestrator_lambda = PythonFunction(self, "OrchestratorLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/orchestrator',
                                                     index='orchestrator.py',

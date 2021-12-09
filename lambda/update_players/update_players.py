@@ -64,7 +64,7 @@ def handler(event, context):
         players = query_leaderboard(region)
         for player in players:
             item = {os.environ['PARTITION_KEY']: player['steamAccountId'], 'region': region}
-            table.put_item(item)
+            table.put_item(Item=item)
 
 
 

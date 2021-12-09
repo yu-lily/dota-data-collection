@@ -11,6 +11,7 @@ from aws_cdk import (
     aws_sqs as sqs,
     aws_events as events,
     aws_secretsmanager as sm,
+    aws_iam as iam,
     core
 )
 from aws_cdk.aws_lambda_python import PythonFunction
@@ -20,10 +21,11 @@ class DotaDataCollectionStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # # Create secrets manager
-        # secret_name = "dota_api_key"
-        # secret = sm.Secret(self, "Secret",
-        #                     secret_name=secret_name,
+        # Handle Stratz API Key
+        stratz_apikey = sm.Secret.from_secret_name_v2(self, "stratz/apikey")
+        stratz_api_caller = iam.Role(self, 'StratzAPICaller',
+            assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
+        stratz_apikey.grant_read(stratz_api_caller)
 
         # Create a DynamoDB table
         players_table = ddb.Table(self, "PlayersTable",
@@ -61,3 +63,4 @@ class DotaDataCollectionStack(cdk.Stack):
                                                     }
                                                 )
         
+        players_table.grant_read_write_data(update_players_lambda)

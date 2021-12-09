@@ -13,9 +13,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Install CDK and Gatsby
+#       - name: Install CDK
+#         run: |
+#           npm install -g aws-cdk@1.x
+        
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.15.1"
+
+      - name: Install CDK
         run: |
-          npm install -g aws-cdk@1.x
+          npm install -g aws-cdk
+
+      - name: Use Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Run CDK Deploy
+        run: |
+          pip install --ignore-installed -r requirements.txt
+          cdk deploy dota-data-collection
         
 #       - name: cdk diff
 #         uses: yu-lily/aws-cdk-github-actions@v2
@@ -29,27 +55,27 @@ jobs:
 #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #           AWS_DEFAULT_REGION: 'us-west-2'
           
-      - name: cdk synth
-        uses: yu-lily/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'synth'
-          cdk_version: '1.16.2'
-          working_dir: 'src'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-west-2'
+#       - name: cdk synth
+#         uses: yu-lily/aws-cdk-github-actions@v2
+#         with:
+#           cdk_subcommand: 'synth'
+#           cdk_version: '1.16.2'
+#           working_dir: 'src'
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: 'us-west-2'
           
-      - name: cdk deploy
-        uses: yu-lily/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'deploy'
-          cdk_stack: 'dota_data_collection'
-          cdk_args: '--require-approval never'
-          actions_comment: false
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-west-2'
+#       - name: cdk deploy
+#         uses: yu-lily/aws-cdk-github-actions@v2
+#         with:
+#           cdk_subcommand: 'deploy'
+#           cdk_stack: 'dota_data_collection'
+#           cdk_args: '--require-approval never'
+#           actions_comment: false
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: 'us-west-2'
 
 

@@ -17,17 +17,17 @@ jobs:
         run: |
           npm install -g aws-cdk@1.x
         
-      - name: cdk diff
-        uses: yu-lily/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'diff'
-          actions_comment: true
-          debug_log: true
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_DEFAULT_REGION: 'us-west-2'
+#       - name: cdk diff
+#         uses: yu-lily/aws-cdk-github-actions@v2
+#         with:
+#           cdk_subcommand: 'diff'
+#           actions_comment: true
+#           debug_log: true
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           AWS_DEFAULT_REGION: 'us-west-2'
           
       - name: cdk synth
         uses: yu-lily/aws-cdk-github-actions@v2

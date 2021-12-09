@@ -60,8 +60,9 @@ def handler(event, context):
     table = client.Table(os.environ['TABLE_NAME'])
 
     REGIONS = ['AMERICAS', 'SE_ASIA', 'EUROPE', 'CHINA']
-    for region in REGIONS:
-        players = query_leaderboard(region)
-        for player in players:
-            item = {os.environ['PARTITION_KEY']: player['steamAccountId'], 'region': region}
-            table.put_item(Item=item)
+    with table.batch_writer() as batch:
+        for region in REGIONS:
+            players = query_leaderboard(region)
+            for player in players:
+                item = {os.environ['PARTITION_KEY']: player['steamAccountId'], 'region': region}
+                batch.put_item(Item=item)

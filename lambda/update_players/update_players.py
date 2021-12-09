@@ -33,19 +33,16 @@ def get_apikey():
     return json.loads(secret)['apikey']
 
 def query_leaderboard(region):
-    endpoint = "https://api.stratz.com/graphql/"
-    query = '''
-    {
+    endpoint = "https://api.stratz.com/graphql"
+    query = """
+    query ($region: LeaderboardDivision) {
     leaderboard {
-        season(request: {leaderBoardDivision:$region, take: 6000}) {
+        season(request: {leaderBoardDivision: $region, take: 6000}) {
         steamAccountId 
         }
     }
     }
-    '''
-    # lastUpdateDateTime
-    # rank
-    # rankShift
+    """
     
     variables = {'region': region}
     headers = {'Authorization': 'Bearer ' + get_apikey()}

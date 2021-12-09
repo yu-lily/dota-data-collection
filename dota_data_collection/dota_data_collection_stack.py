@@ -7,6 +7,7 @@ from aws_cdk import core as cdk
 from aws_cdk import (
     aws_dynamodb as ddb,
     aws_lambda_python as py_lambda,
+    aws_lambda as _lambda,
     aws_sqs as sqs,
     aws_events as events,
     aws_secretsmanager as sm,
@@ -19,23 +20,22 @@ class DotaDataCollectionStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Create secrets manager
-        secret_name = "dota_api_key"
-        secret = sm.Secret(self, "Secret",
-                            secret_name=secret_name,
+        # # Create secrets manager
+        # secret_name = "dota_api_key"
+        # secret = sm.Secret(self, "Secret",
+        #                     secret_name=secret_name,
 
         # Create a DynamoDB table
         players_table = ddb.Table(self, "PlayersTable",
                                     partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
-                                )
-                                    #billing_mode=ddb.BillingMode.PAY_PER_REQUEST)
+                                )#billing_mode=ddb.BillingMode.PAY_PER_REQUEST)
         match_table = ddb.Table(self, "MatchTable",
                                     partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
                                 )
         
         # Create a Lambda function
         update_players_lambda = PythonFunction(self, "UpdatePlayersLambda",
-                                                    runtime=py_lambda.Runtime.PYTHON_3_7,
+                                                    runtime=_lambda.Runtime.PYTHON_3_7,
                                                     entry='lambda/update_players',
                                                     index='update_players.py',
                                                     handler='handler',
@@ -48,7 +48,7 @@ class DotaDataCollectionStack(cdk.Stack):
                                                     }
                                                 )
         queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
-                                                    runtime=py_lambda.Runtime.PYTHON_3_7,
+                                                    runtime=_lambda.Runtime.PYTHON_3_7,
                                                     entry='lambda/queue_players',
                                                     index='queue_players.py',
                                                     handler='handler',

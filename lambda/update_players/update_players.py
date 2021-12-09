@@ -57,7 +57,7 @@ def query_leaderboard(region):
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 
-    client = boto3.client('dynamodb')
+    client = boto3.resource('dynamodb')
     table = client.Table(os.environ['TABLE_NAME'])
 
     REGIONS = ['AMERICAS', 'SE_ASIA', 'EUROPE', 'CHINA']

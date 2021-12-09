@@ -6,7 +6,7 @@ import os
 import io
 import time
 import requests
-from codeguru_profiler_agent import with_lambda_profiler
+
 
 def get_apikey():
 
@@ -53,7 +53,6 @@ def query_leaderboard(region):
         print(f"Query failed with status code: {r.status_code}")
         print(f"Response: {r.text}")
 
-@with_lambda_profiler(profiling_group_name="UpdatePlayersProfiler")
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 

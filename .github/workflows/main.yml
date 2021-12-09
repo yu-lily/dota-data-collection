@@ -13,11 +13,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
+      - name: Install CDK and Gatsby
+        run: |
+          npm install -g aws-cdk@1.x
+        
       - name: cdk diff
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'diff'
           actions_comment: true
+          debug_log: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

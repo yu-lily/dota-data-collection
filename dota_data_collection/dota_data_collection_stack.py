@@ -36,6 +36,8 @@ class DotaDataCollectionStack(cdk.Stack):
                                 )
         
         # Create a Lambda function
+
+        
         update_players_lambda = PythonFunction(self, "UpdatePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/update_players',
@@ -45,12 +47,11 @@ class DotaDataCollectionStack(cdk.Stack):
                                                         "TABLE_NAME": players_table.table_name,
                                                         "PARTITION_KEY": "player_id",
                                                         "SORT_KEY": "player_name",
-                                                        "DDB_REGION": "us-east-1",
-                                                        "DDB_ENDPOINT": "http://localhost:8000"
                                                     },
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
                                                 )
+        
         queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/queue_players',
@@ -60,12 +61,26 @@ class DotaDataCollectionStack(cdk.Stack):
                                                         "TABLE_NAME": players_table.table_name,
                                                         "PARTITION_KEY": "player_id",
                                                         "SORT_KEY": "player_name",
-                                                        "DDB_REGION": "us-east-1",
-                                                        "DDB_ENDPOINT": "http://localhost:8000"
                                                     },
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
                                                 )
+
+        orchestrator_lambda = _lambda.Function(self, "OrchestratorLambda",
+                                                    runtime=_lambda.Runtime.PYTHON_3_8,
+                                                    entry='lambda/orchestrator',
+                                                    index='orchestrator.py',
+                                                    handler='handler',
+                                                    environment={
+                                                        "TABLE_NAME": players_table.table_name,
+                                                        "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
+                                                        "PARTITION_KEY": "player_id",
+                                                        "SORT_KEY": "player_name",
+                                                    },
+                                                    timeout=core.Duration.minutes(10),
+                                                    profiling=True,
+                                                )                     
+        update_players_lambda.grant_invoke(orchestrator_lambda)
         
         players_table.grant_read_write_data(update_players_lambda)
         stratz_apikey.grant_read(update_players_lambda)

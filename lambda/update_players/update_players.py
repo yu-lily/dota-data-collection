@@ -58,13 +58,12 @@ def handler(event, context):
 
     client = boto3.resource('dynamodb')
     table = client.Table(os.environ['TABLE_NAME'])
+    region = event['region']
 
     #Without batch writing: ~3200 entires in 10m
     #With batch writing: ~5200 entries in 10m
-    REGIONS = ['AMERICAS', 'SE_ASIA', 'EUROPE', 'CHINA']
     with table.batch_writer() as batch:
-        for region in REGIONS:
-            players = query_leaderboard(region)
-            for player in players:
-                item = {os.environ['PARTITION_KEY']: player['steamAccountId'], 'region': region}
-                batch.put_item(Item=item)
+        players = query_leaderboard(region)
+        for player in players:
+            item = {os.environ['PARTITION_KEY']: player['steamAccountId'], 'region': region}
+            batch.put_item(Item=item)

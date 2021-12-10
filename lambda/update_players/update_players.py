@@ -57,7 +57,7 @@ def query_leaderboard(region):
     r = requests.post(endpoint, json={'query': query , 'variables': variables}, headers=headers)
     
     ts = int(time.time())
-    rand = random.randint(0, 1000)
+    rand = random.randint(0, 999)
     api_call_id = (ts * 1000) + rand
     #Log that the request was made
     item = {

@@ -1,9 +1,5 @@
 from aws_cdk import core as cdk
 
-# For consistency with other languages, `cdk` is the preferred import name for
-# the CDK's core module.  The following line also imports it as `core` for use
-# with examples from the CDK Developer's Guide, which are in the process of
-# being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import (
     aws_dynamodb as ddb,
     aws_lambda_python as py_lambda,
@@ -49,12 +45,7 @@ class DotaDataCollectionStack(cdk.Stack):
 
         update_players_lambda = _lambda.Function(self, "UpdatePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    #entry='lambda/update_players',
-                                                    #index='update_players.py',
-                                                    handler='handler',
-                                                    environment=LAMBDA_ENVS,
-                                                    timeout=core.Duration.minutes(10),
-                                                    profiling=True,
+                                                    handler='update_players.handler',
                                                     code=_lambda.Code.from_asset(
                                                         "lambda/update_players",
                                                         bundling=core.BundlingOptions(
@@ -65,14 +56,24 @@ class DotaDataCollectionStack(cdk.Stack):
                                                             ],
                                                         ),
                                                     ),
+                                                    environment=LAMBDA_ENVS,
+                                                    timeout=core.Duration.minutes(10),
+                                                    profiling=True,
                                                 )
 
-        
-        queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
+        queue_players_lambda = _lambda.Function(self, "QueuePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    entry='lambda/queue_players',
-                                                    index='queue_players.py',
-                                                    handler='handler',
+                                                    handler='queue_players.handler',
+                                                    code=_lambda.Code.from_asset(
+                                                        "lambda/queue_players",
+                                                        bundling=core.BundlingOptions(
+                                                            image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                                                            command=[
+                                                                "bash", "-c",
+                                                                "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                                                            ],
+                                                        ),
+                                                    ),
                                                     environment=LAMBDA_ENVS,
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
@@ -80,16 +81,24 @@ class DotaDataCollectionStack(cdk.Stack):
         LAMBDA_FUNC_NAMES = {
             "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
         }
-        orchestrator_lambda = PythonFunction(self, "OrchestratorLambda",
+
+        orchestrator_lambda = _lambda.Function(self, "OrchestratorLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    entry='lambda/orchestrator',
-                                                    index='orchestrator.py',
-                                                    handler='handler',
+                                                    handler='orchestrator.handler',
+                                                    code=_lambda.Code.from_asset(
+                                                        "lambda/orchestrator",
+                                                        bundling=core.BundlingOptions(
+                                                            image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                                                            command=[
+                                                                "bash", "-c",
+                                                                "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                                                            ],
+                                                        ),
+                                                    ),
                                                     environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
-                                                )              
-
+                                                )
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API

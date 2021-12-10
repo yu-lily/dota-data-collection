@@ -46,15 +46,27 @@ class DotaDataCollectionStack(cdk.Stack):
                         "API_CALLS_TABLE": api_calls_table.table_name,
                         "PARTITION_KEY": "player_id",
         }
-        update_players_lambda = PythonFunction(self, "UpdatePlayersLambda",
+
+        update_players_lambda = _lambda.Function(self, "UpdatePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    entry='lambda/update_players',
-                                                    index='update_players.py',
+                                                    #entry='lambda/update_players',
+                                                    #index='update_players.py',
                                                     handler='handler',
                                                     environment=LAMBDA_ENVS,
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
+                                                    code=_lambda.Code.from_asset(
+                                                        "lambda/update_players",
+                                                        bundling=core.BundlingOptions(
+                                                            image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                                                            command=[
+                                                                "bash", "-c",
+                                                                "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                                                            ],
+                                                        ),
+                                                    ),
                                                 )
+
         
         queue_players_lambda = PythonFunction(self, "QueuePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,

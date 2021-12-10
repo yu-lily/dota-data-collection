@@ -25,7 +25,7 @@ class DotaDataCollectionStack(cdk.Stack):
         stratz_apikey = sm.Secret.from_secret_name_v2(self, "StratzAPIKey", secret_name="stratz/apikey")
         stratz_api_caller = iam.Role(self, 'StratzAPICaller',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
-        stratz_apikey.grant_read(stratz_api_caller)
+        
 
         # Create a DynamoDB table
         players_table = ddb.Table(self, "PlayersTable",
@@ -35,10 +35,13 @@ class DotaDataCollectionStack(cdk.Stack):
         match_table = ddb.Table(self, "MatchTable",
                                     partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
                                 )
-        
-        # Create a Lambda function
+        api_calls_table = ddb.Table(self, "APICallsTable",
+                                    partition_key=ddb.Attribute(name="api_call_id", type=ddb.AttributeType.NUMBER),
+                                    billing_mode=ddb.BillingMode.PAY_PER_REQUEST
+                                )
 
-        
+
+        # Create a Lambda function
         update_players_lambda = PythonFunction(self, "UpdatePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/update_players',
@@ -80,8 +83,26 @@ class DotaDataCollectionStack(cdk.Stack):
                                                     },
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
-                                                )                     
-        update_players_lambda.grant_invoke(orchestrator_lambda)
-        
-        players_table.grant_read_write_data(update_players_lambda)
+                                                )              
+
+        #STRATZ API KEY ACCESS
+        #Give Stratz API Key access to functions that call the API
         stratz_apikey.grant_read(update_players_lambda)
+        stratz_apikey.grant_read(queue_players_lambda)
+
+        #ALLOW FUNCTION CALLS
+        #Allow the orchestrator function to call other functions
+        update_players_lambda.grant_invoke(orchestrator_lambda)
+        queue_players_lambda.grant_invoke(orchestrator_lambda)
+
+        #API CALLS LOG DATABASE PERMISSIONS
+        #Allow functions to record when the make API calls
+        api_calls_table.grant_write_data(update_players_lambda)
+        api_calls_table.grant_write_data(queue_players_lambda)
+
+        #Allow orchestrator to check the API calls table
+        api_calls_table.grant_read_data(orchestrator_lambda)
+        
+        #OTHER HELPER DATABASE PERMISSIONS
+        #Give appropriate ddb read/write access to functions
+        players_table.grant_read_write_data(update_players_lambda)

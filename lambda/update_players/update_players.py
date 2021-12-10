@@ -59,11 +59,15 @@ def handler(event, context):
     client = boto3.resource('dynamodb')
     table = client.Table(os.environ['TABLE_NAME'])
     region = event['region']
+    pkey = os.environ['PARTITION_KEY']
 
     #Without batch writing: ~3200 entires in 10m
     #With batch writing: ~5200 entries in 10m
     with table.batch_writer() as batch:
         players = query_leaderboard(region)
         for player in players:
-            item = {os.environ['PARTITION_KEY']: player['steamAccountId'], 'region': region}
+            #Check if the player existsin the table already
+            #table.get_item(Key={pkey: player['steamAccountId']})
+            #TODO: Batch get items, and only write if the item doesn't exist
+            item = {pkey: player['steamAccountId'], 'region': region}
             batch.put_item(Item=item)

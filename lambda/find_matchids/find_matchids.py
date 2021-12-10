@@ -37,8 +37,32 @@ def get_apikey():
     
     return json.loads(secret)['apikey']
 
-def query_leaderboard(region):
+def handler(event, context):
+    print('request: {}'.format(json.dumps(event)))
+
+def graphql_query(query, vars):
     endpoint = "https://api.stratz.com/graphql"
+    headers = {'Authorization': 'Bearer ' + get_apikey()}
+    print(query, vars)
+    r = requests.post(endpoint, json={'query': query , 'variables': vars}, headers=headers)
+
+    #Log that the request was made
+    ts = int(time.time())
+    rand = random.randint(0, 999)
+    api_call_id = (ts * 1000) + rand
+    item = {
+        'api_call_id': api_call_id,
+        'function': FUNC_NAME,
+        'logGroup': LOG_GROUP,
+        'logStream': LOG_STREAM,
+        'timestamp': ts,
+        'statusCode': r.status_code
+        }
+    api_calls_table.put_item(Item=item)
+    
+    return r
+
+def query_player_match_history(playerids):
     query = """
     query ($region: LeaderboardDivision) {
     leaderboard {
@@ -49,44 +73,12 @@ def query_leaderboard(region):
     }
     """
     
-    variables = {'region': region}
-    headers = {'Authorization': 'Bearer ' + get_apikey()}
-    print(query, variables)
-    r = requests.post(endpoint, json={'query': query , 'variables': variables}, headers=headers)
+    variables = {'playerids': playerids}
     
-    ts = int(time.time())
-    rand = random.randint(0, 999)
-    api_call_id = (ts * 1000) + rand
-    #Log that the request was made
-    item = {
-        'api_call_id': api_call_id,
-        'function': FUNC_NAME,
-        'logGroup': LOG_GROUP,
-        'logStream': LOG_STREAM,
-        'timestamp': ts,
-        'statusCode': r.status_code
-        }
-    api_calls_table.put_item(Item=item)
+    r = graphql_query(query, variables)
 
     if r.status_code == 200:
         return json.loads(r.text)['data']['leaderboard']['season']
     else:
         print(f"Query failed with status code: {r.status_code}")
         print(f"Response: {r.text}")
-
-def handler(event, context):
-    print('request: {}'.format(json.dumps(event)))
-
-    region = event['region']
-    pkey = os.environ['PARTITION_KEY']
-
-    #Without batch writing: ~3200 entires in 10m
-    #With batch writing: ~5200 entries in 10m
-    with players_table.batch_writer() as batch:
-        players = query_leaderboard(region)
-        for player in players:
-            #Check if the player existsin the table already
-            #table.get_item(Key={pkey: player['steamAccountId']})
-            #TODO: Batch get items, and only write if the item doesn't exist
-            item = {pkey: player['steamAccountId'], 'region': region}
-            batch.put_item(Item=item)

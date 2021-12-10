@@ -16,3 +16,8 @@ def handler(event, context):
 
     for region in REGIONS:
         lambdaClient.invoke(FunctionName=update_players, InvocationType='Event', Payload=json.dumps({'region': region}))
+
+    
+    #Put all matches in sqs queue
+
+    #Call find_matchids lambda in a throttled fashion, working through the queue

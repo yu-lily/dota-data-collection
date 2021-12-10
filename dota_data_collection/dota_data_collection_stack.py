@@ -40,18 +40,18 @@ class DotaDataCollectionStack(cdk.Stack):
                                     billing_mode=ddb.BillingMode.PAY_PER_REQUEST
                                 )
 
-
-        # Create a Lambda function
+        # Lambda Functions
+        LAMBDA_ENVS = {
+                        "TABLE_NAME": players_table.table_name,
+                        "API_CALLS_TABLE": api_calls_table.table_name,
+                        "PARTITION_KEY": "player_id",
+        }
         update_players_lambda = PythonFunction(self, "UpdatePlayersLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/update_players',
                                                     index='update_players.py',
                                                     handler='handler',
-                                                    environment={
-                                                        "TABLE_NAME": players_table.table_name,
-                                                        "PARTITION_KEY": "player_id",
-                                                        "SORT_KEY": "player_name",
-                                                    },
+                                                    environment=LAMBDA_ENVS,
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
                                                 )
@@ -61,29 +61,23 @@ class DotaDataCollectionStack(cdk.Stack):
                                                     entry='lambda/queue_players',
                                                     index='queue_players.py',
                                                     handler='handler',
-                                                    environment={
-                                                        "TABLE_NAME": players_table.table_name,
-                                                        "PARTITION_KEY": "player_id",
-                                                        "SORT_KEY": "player_name",
-                                                    },
+                                                    environment=LAMBDA_ENVS,
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
                                                 )
-
+        LAMBDA_FUNC_NAMES = {
+            "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
+        }
         orchestrator_lambda = PythonFunction(self, "OrchestratorLambda",
                                                     runtime=_lambda.Runtime.PYTHON_3_8,
                                                     entry='lambda/orchestrator',
                                                     index='orchestrator.py',
                                                     handler='handler',
-                                                    environment={
-                                                        "TABLE_NAME": players_table.table_name,
-                                                        "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
-                                                        "PARTITION_KEY": "player_id",
-                                                        "SORT_KEY": "player_name",
-                                                    },
+                                                    environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
                                                     timeout=core.Duration.minutes(10),
                                                     profiling=True,
                                                 )              
+
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API

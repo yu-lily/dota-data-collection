@@ -24,82 +24,89 @@ class DotaDataCollectionStack(cdk.Stack):
         
 
         # Create a DynamoDB table
-        players_table = ddb.Table(self, "PlayersTable",
-                                    partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
-                                    billing_mode=ddb.BillingMode.PAY_PER_REQUEST
-                                )
-        matchid_table = ddb.Table(self, "MatchIDTable",
-                                    partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
-                                )
-        api_calls_table = ddb.Table(self, "APICallsTable",
-                                    partition_key=ddb.Attribute(name="api_call_id", type=ddb.AttributeType.NUMBER),
-                                    billing_mode=ddb.BillingMode.PAY_PER_REQUEST
-                                )
+        players_table = ddb.Table(
+            self, "PlayersTable",
+            partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
+            billing_mode=ddb.BillingMode.PAY_PER_REQUEST
+        )
+        matchid_table = ddb.Table(
+            self, "MatchIDTable",
+            partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
+        )
+        api_calls_table = ddb.Table(
+            self, "APICallsTable",
+            partition_key=ddb.Attribute(name="api_call_id", type=ddb.AttributeType.NUMBER),
+            billing_mode=ddb.BillingMode.PAY_PER_REQUEST
+        )
 
         # Lambda Functions
         LAMBDA_ENVS = {
-                        "PLAYERS_NAME": players_table.table_name,
-                        "MATCHID_TABLE": matchid_table.table_name,
-                        "API_CALLS_TABLE": api_calls_table.table_name,
-                        "PARTITION_KEY": "player_id",
+            "PLAYERS_NAME": players_table.table_name,
+            "MATCHID_TABLE": matchid_table.table_name,
+            "API_CALLS_TABLE": api_calls_table.table_name,
+            "PARTITION_KEY": "player_id",
         }
 
-        update_players_lambda = _lambda.Function(self, "UpdatePlayersLambda",
-                                                    runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    handler='update_players.handler',
-                                                    code=_lambda.Code.from_asset(
-                                                        "lambda/update_players",
-                                                        bundling=core.BundlingOptions(
-                                                            image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-                                                            command=[
-                                                                "bash", "-c",
-                                                                "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    environment=LAMBDA_ENVS,
-                                                    timeout=core.Duration.minutes(10),
-                                                    profiling=True,
-                                                )
+        update_players_lambda = _lambda.Function(
+            self, "UpdatePlayersLambda",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler='update_players.handler',
+            code=_lambda.Code.from_asset(
+                "lambda/update_players",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment=LAMBDA_ENVS,
+            timeout=core.Duration.minutes(10),
+            profiling=True,
+        )
 
-        find_matchids_lambda = _lambda.Function(self, "FindMatchIDsLambda",
-                                                    runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    handler='find_matchids.handler',
-                                                    code=_lambda.Code.from_asset(
-                                                        "lambda/find_matchids",
-                                                        bundling=core.BundlingOptions(
-                                                            image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-                                                            command=[
-                                                                "bash", "-c",
-                                                                "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    environment=LAMBDA_ENVS,
-                                                    timeout=core.Duration.minutes(10),
-                                                    profiling=True,
-                                                )
+        find_matchids_lambda = _lambda.Function(
+            self, "FindMatchIDsLambda",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler='find_matchids.handler',
+            code=_lambda.Code.from_asset(
+                "lambda/find_matchids",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment=LAMBDA_ENVS,
+            timeout=core.Duration.minutes(10),
+            profiling=True,
+        )
         LAMBDA_FUNC_NAMES = {
             "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
+            "FIND_MATCHIDS_FUNC_NAME": find_matchids_lambda.function_name,
         }
 
-        orchestrator_lambda = _lambda.Function(self, "OrchestratorLambda",
-                                                    runtime=_lambda.Runtime.PYTHON_3_8,
-                                                    handler='orchestrator.handler',
-                                                    code=_lambda.Code.from_asset(
-                                                        "lambda/orchestrator",
-                                                        bundling=core.BundlingOptions(
-                                                            image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-                                                            command=[
-                                                                "bash", "-c",
-                                                                "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
-                                                    timeout=core.Duration.minutes(10),
-                                                    profiling=True,
-                                                )
+        orchestrator_lambda = _lambda.Function(
+            self, "OrchestratorLambda",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler='orchestrator.handler',
+            code=_lambda.Code.from_asset(
+                "lambda/orchestrator",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
+            timeout=core.Duration.minutes(10),
+            profiling=True,
+        )
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API

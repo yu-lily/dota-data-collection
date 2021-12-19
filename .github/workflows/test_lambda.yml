@@ -41,9 +41,13 @@ jobs:
         run: |
           pip install --ignore-installed -r requirements.txt
           cdk synth --no-staging > template.yaml
+          ls
           
       - name: Run SAM Test
         run: |
+          ls
+          pip install --ignore-installed -r requirements.txt
+          cdk synth --no-staging > template.yaml
           cat template.yml
           sam local invoke ${{ env.FUNCTION }}/${{ env.STACK }} -e test/na_region.json
         env:

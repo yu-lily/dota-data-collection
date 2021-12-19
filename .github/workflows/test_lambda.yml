@@ -20,6 +20,8 @@ jobs:
           
       - name: Install SAM
         uses: aws-actions/setup-sam@v1
+        with:
+          version: "sam-cli-beta-cdk"
           
       - name: Install CDK
         run: |

@@ -44,4 +44,4 @@ jobs:
           
       - name: Run SAM Test
         run: |
-          sam local invoke DotaDataCollectionStack/FindMatchIDsLambda -e na_region.json
+          sam local invoke DotaDataCollectionStack/FindMatchIDsLambda -e test/na_region.json

@@ -46,7 +46,7 @@ jobs:
       - name: Run SAM Test
         run: |
           #Grep command finds the functional id of the lambda function (this changes with every synth)
-          sam local invoke ${{ env.STACK }}/`grep -Po '(${{ env.FUNCTION }}\w{8})(?=:)' template.yaml` -e test/na_region.json
+          sam local invoke `grep -Po '(${{ env.FUNCTION }}\w{8})(?=:)' template.yaml` -e test/na_region.json
         env:
           FUNCTION: FindMatchIDsLambda
           STACK: DotaDataCollectionStack

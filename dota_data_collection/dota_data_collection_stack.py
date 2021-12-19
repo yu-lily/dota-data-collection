@@ -45,7 +45,7 @@ class DotaDataCollectionStack(cdk.Stack):
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(
             self, "APICallerLayer",
-            code=_lambda.Code.asset("api_caller_layer"),
+            code=_lambda.Code.from_asset("api_caller_layer"),
             compatible_runtimes=[
                 _lambda.Runtime.PYTHON_3_7,
                 _lambda.Runtime.PYTHON_3_8

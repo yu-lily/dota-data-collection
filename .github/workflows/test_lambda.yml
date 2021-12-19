@@ -45,8 +45,8 @@ jobs:
           
       - name: Run SAM Test
         run: |
-          echo "FUNCTION_ID=$(grep -Po '(${{ env.FUNCTION }}\w{8})(?=:)' template.yaml)" >> $GITHUB_ENV #Find logical id of function
-          sam local invoke ${{ env.STACK }}/${{ env.FUNCTION_ID }} -e test/na_region.json
+          #Grep command finds the functional id of the lambda function (this changes with every synth)
+          sam local invoke ${{ env.STACK }}/`grep -Po '(${{ env.FUNCTION }}\w{8})(?=:)' template.yaml` -e test/na_region.json
         env:
           FUNCTION: FindMatchIDsLambda
           STACK: DotaDataCollectionStack

@@ -40,6 +40,15 @@ class DotaDataCollectionStack(cdk.Stack):
         )
 
         # Lambda Functions
+        api_caller_layer = _lambda.LayerVersion(
+            self, "APICallerLayer",
+            code=_lambda.Code.asset("api_caller_layer"),
+            compatible_runtimes=[
+                _lambda.Runtime.PYTHON_3_7,
+                _lambda.Runtime.PYTHON_3_8
+            ]
+        )
+
         LAMBDA_ENVS = {
             "PLAYERS_NAME": players_table.table_name,
             "MATCHID_TABLE": matchid_table.table_name,
@@ -64,6 +73,7 @@ class DotaDataCollectionStack(cdk.Stack):
             environment=LAMBDA_ENVS,
             timeout=core.Duration.minutes(10),
             profiling=True,
+            layers=[api_caller_layer],
         )
 
         find_matchids_lambda = _lambda.Function(
@@ -83,6 +93,7 @@ class DotaDataCollectionStack(cdk.Stack):
             environment=LAMBDA_ENVS,
             timeout=core.Duration.minutes(10),
             profiling=True,
+            layers=[api_caller_layer],
         )
         LAMBDA_FUNC_NAMES = {
             "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,

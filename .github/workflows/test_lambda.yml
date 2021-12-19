@@ -1,4 +1,4 @@
-name: CDK Deploy
+name: Test Lambda
 
 on:
   push:

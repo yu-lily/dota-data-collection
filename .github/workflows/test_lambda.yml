@@ -19,7 +19,7 @@ jobs:
           node-version: "14.15.1"
           
       - name: Install SAM
-        uses: yu-lily/setup-sam@v1.2
+        uses: yu-lily/setup-sam@v1.3
         with:
           version: "1.29.0.dev202108311500"
           

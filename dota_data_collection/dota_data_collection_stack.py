@@ -27,16 +27,19 @@ class DotaDataCollectionStack(cdk.Stack):
         players_table = ddb.Table(
             self, "PlayersTable",
             partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
-            billing_mode=ddb.BillingMode.PAY_PER_REQUEST
+            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=core.RemovalPolicy.DESTROY
         )
         matchid_table = ddb.Table(
             self, "MatchIDTable",
             partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
+            removal_policy=core.RemovalPolicy.DESTROY
         )
         api_calls_table = ddb.Table(
             self, "APICallsTable",
             partition_key=ddb.Attribute(name="api_call_id", type=ddb.AttributeType.NUMBER),
-            billing_mode=ddb.BillingMode.PAY_PER_REQUEST
+            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=core.RemovalPolicy.DESTROY
         )
 
         # Lambda Functions

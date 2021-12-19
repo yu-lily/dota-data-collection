@@ -56,7 +56,7 @@ class APICaller:
             'timestamp': ts,
             'statusCode': r.status_code
             }
-        self.api_calls_table.put_item(Item=item)
+        self.api_calls_table_client.put_item(Item=item)
         
         return r
 

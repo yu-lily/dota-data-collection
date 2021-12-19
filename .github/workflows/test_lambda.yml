@@ -19,7 +19,7 @@ jobs:
           node-version: "14.15.1"
           
       - name: Install SAM
-        uses: aws-actions/setup-sam@v1
+        uses: actions/setup-aws-sam-cli-beta@v1
         with:
           version: "1.29.0.dev202108311500"
           

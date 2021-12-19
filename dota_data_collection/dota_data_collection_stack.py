@@ -50,7 +50,7 @@ class DotaDataCollectionStack(cdk.Stack):
         )
 
         LAMBDA_ENVS = {
-            "PLAYERS_NAME": players_table.table_name,
+            "PLAYERS_TABLE": players_table.table_name,
             "MATCHID_TABLE": matchid_table.table_name,
             "API_CALLS_TABLE": api_calls_table.table_name,
             "PARTITION_KEY": "player_id",

@@ -11,7 +11,7 @@ import random
 from api_caller.lib import APICaller, API_Call_Metadata
 
 client = boto3.resource('dynamodb')
-players_table = client.Table(os.environ['TABLE_NAME'])
+players_table = client.Table(os.environ['PLAYERS_TABLE'])
 api_calls_table = client.Table(os.environ['API_CALLS_TABLE'])
 FUNC_NAME = os.environ['AWS_LAMBDA_FUNCTION_NAME']
 LOG_GROUP = os.environ['AWS_LAMBDA_LOG_GROUP_NAME']

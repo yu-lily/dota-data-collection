@@ -46,9 +46,7 @@ jobs:
       - name: Run SAM Test
         run: |
           ls
-          pip install --ignore-installed -r requirements.txt
-          cdk synth --no-staging > template.yaml
-          cat template.yml
+          cat template.yaml
           sam local invoke ${{ env.FUNCTION }}/${{ env.STACK }} -e test/na_region.json
         env:
           FUNCTION: FindMatchIDsLambda

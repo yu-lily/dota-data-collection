@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  aws_cdk:
+  test_lambda:
     runs-on: ubuntu-latest
     steps:
     

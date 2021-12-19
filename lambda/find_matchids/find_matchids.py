@@ -1,21 +1,19 @@
 import json
-from logging import exception
 import boto3
-import base64
 import os
-import io
-import time
-import requests
-import random
 
 from api_caller.lib import APICaller, API_Call_Metadata
 
+#Create clients for interfacting with AWS resources
 client = boto3.resource('dynamodb')
 players_table = client.Table(os.environ['PLAYERS_TABLE'])
 api_calls_table = client.Table(os.environ['API_CALLS_TABLE'])
+
+#Load metadata for logging
 FUNC_NAME = os.environ['AWS_LAMBDA_FUNCTION_NAME']
 LOG_GROUP = os.environ['AWS_LAMBDA_LOG_GROUP_NAME']
 LOG_STREAM = os.environ['AWS_LAMBDA_LOG_STREAM_NAME']
+metadata = API_Call_Metadata(FUNC_NAME, LOG_GROUP, LOG_STREAM)
 
 query = """
 query ($region: LeaderboardDivision) {
@@ -26,7 +24,7 @@ leaderboard {
 }
 }
 """
-metadata = API_Call_Metadata(FUNC_NAME, LOG_GROUP, LOG_STREAM)
+
 
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))

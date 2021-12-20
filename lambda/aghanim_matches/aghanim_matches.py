@@ -21,10 +21,13 @@ with open('query.txt', 'r') as f:
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 
-    region = event['region']
-    variables = {'region': region}
-
-    pkey = os.environ['PARTITION_KEY']
+    variables = {
+        "createdAfterDateTime": event['start_time'],
+        "createdBeforeDateTime": event['end_time'],
+        "difficulty": event['difficulty'],
+        "take": 100,
+        "skip": 0
+    }
 
     #Make API call
     api_caller = APICaller(api_calls_table)

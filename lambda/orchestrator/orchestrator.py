@@ -13,7 +13,7 @@ def handler(event, context):
 
     REGIONS = ['AMERICAS', 'SE_ASIA', 'EUROPE', 'CHINA']
     update_players = os.environ['UPDATE_PLAYERS_FUNC_NAME']
-
+    
     for region in REGIONS:
         lambdaClient.invoke(FunctionName=update_players, InvocationType='Event', Payload=json.dumps({'region': region}))
 
@@ -25,3 +25,12 @@ def handler(event, context):
     #Put all matches in sqs queue
 
     #Call find_matchids lambda in a throttled fashion, working through the queue
+
+
+    aghs_matches = os.environ['AGHANIM_MATCHES_FUNC_NAME']
+    aghs_payload = {
+        "start_time": 0,
+        "end_time": 1639863998,
+        "difficulty": "APEXMAGE",
+    }
+    #lambdaClient.invoke(FunctionName=aghs_matches, InvocationType='Event', Payload=json.dumps({'region': region}))

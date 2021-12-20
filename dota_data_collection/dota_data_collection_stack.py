@@ -153,18 +153,21 @@ class DotaDataCollectionStack(cdk.Stack):
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
-        stratz_apikey.grant_read(update_players_lambda)
-        stratz_apikey.grant_read(find_matchids_lambda)
+        #stratz_apikey.grant_read(update_players_lambda)
+        #stratz_apikey.grant_read(find_matchids_lambda)
+        stratz_apikey.grant_read(api_caller_layer)
 
         #ALLOW FUNCTION CALLS
         #Allow the orchestrator function to call other functions
         update_players_lambda.grant_invoke(orchestrator_lambda)
         find_matchids_lambda.grant_invoke(orchestrator_lambda)
+        aghanim_matches_lambda.grant_invoke(orchestrator_lambda)
 
         #API CALLS LOG DATABASE PERMISSIONS
         #Allow functions to record when the make API calls
-        api_calls_table.grant_write_data(update_players_lambda)
-        api_calls_table.grant_write_data(find_matchids_lambda)
+        #api_calls_table.grant_write_data(update_players_lambda)
+        #api_calls_table.grant_write_data(find_matchids_lambda)
+        api_calls_table.grant_write_data(api_caller_layer)
 
         #Allow orchestrator to check the API calls table
         api_calls_table.grant_read_data(orchestrator_lambda)
@@ -174,5 +177,6 @@ class DotaDataCollectionStack(cdk.Stack):
         players_table.grant_read_write_data(update_players_lambda)
         players_table.grant_read_data(find_matchids_lambda)
         matchid_table.grant_read_write_data(find_matchids_lambda)
+        aghanim_matches_table.grant_read_write_data(aghanim_matches_lambda)
 
         

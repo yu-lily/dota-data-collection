@@ -22,11 +22,13 @@ aghs_matches_table = client.Table(os.environ['AGHANIM_MATCHES_TABLE'])
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 
+    INCREMENT = 100
+
     variables = {
         "createdAfterDateTime": event['start_time'],
         "createdBeforeDateTime": event['end_time'],
         "difficulty": event['difficulty'],
-        "take": 100,
+        "take": INCREMENT,
         "skip": 0
     }
 
@@ -39,3 +41,16 @@ def handler(event, context):
     with aghs_matches_table.batch_writer() as batch:
         for match in matches:
             batch.put_item(Item=match)
+
+    #If there are more matches to get, get them
+    while len(matches) == INCREMENT:
+        variables['skip'] += INCREMENT
+
+        print('Getting more matches')
+        print(f'{variables["skip"]=}')
+        data = api_caller.query(query, variables, metadata)
+        matches = data['data']['stratz']['page']['aghanim']['matches']
+
+        with aghs_matches_table.batch_writer() as batch:
+            for match in matches:
+                batch.put_item(Item=match)

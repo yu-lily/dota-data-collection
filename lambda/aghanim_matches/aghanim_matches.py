@@ -37,6 +37,8 @@ def handler(event, context):
     data = api_caller.query(query, variables, metadata)
     matches = data['data']['stratz']['page']['aghanim']['matches']
     print(f'Found {len(matches)} matches, total of {variables["skip"] + len(matches)} so far')
+    if (len(matches) == 0):
+        print(data)
 
     with aghs_matches_table.batch_writer() as batch:
         for match in matches:
@@ -51,7 +53,9 @@ def handler(event, context):
         data = api_caller.query(query, variables, metadata)
         matches = data['data']['stratz']['page']['aghanim']['matches']
         print(f'Found {len(matches)} matches, total of {variables["skip"] + len(matches)} so far')
-
+        if (len(matches) == 0):
+            print(data)
+        
         with aghs_matches_table.batch_writer() as batch:
             for match in matches:
                 batch.put_item(Item=match)

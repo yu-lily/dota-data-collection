@@ -36,7 +36,7 @@ def handler(event, context):
     api_caller = APICaller(api_calls_table)
     data = api_caller.query(query, variables, metadata)
     matches = data['data']['stratz']['page']['aghanim']['matches']
-    print(f'Found {len(matches)} matches')
+    print(f'Found {len(matches)} matches, total of {variables["skip"] + len(matches)} so far')
 
     with aghs_matches_table.batch_writer() as batch:
         for match in matches:
@@ -50,7 +50,7 @@ def handler(event, context):
         print(f'{variables["skip"]=}')
         data = api_caller.query(query, variables, metadata)
         matches = data['data']['stratz']['page']['aghanim']['matches']
-        print(f'Found {len(matches)} matches')
+        print(f'Found {len(matches)} matches, total of {variables["skip"] + len(matches)} so far')
 
         with aghs_matches_table.batch_writer() as batch:
             for match in matches:

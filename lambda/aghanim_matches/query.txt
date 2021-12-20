@@ -2,7 +2,7 @@ query ($createdAfterDateTime: Long, $createdBeforeDateTime: Long, $difficulty: T
   stratz {
     page {
       aghanim {
-        matches(request: {createdAfterDateTime: $createdAfterDateTime, createdBeforeDateTime: $createdBeforeDateTime, difficulty: $difficulty, take: $take, skip:$skip}) {
+        matches(request: {createdAfterDateTime: $createdAfterDateTime, createdBeforeDateTime: $createdBeforeDateTime, difficulty: $difficulty, take: $take, skip:$skip, minDepth: 4}) {
           id
           didWin
           durationSeconds

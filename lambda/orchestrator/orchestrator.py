@@ -26,7 +26,7 @@ def handler(event, context):
 
     #Call find_matchids lambda in a throttled fashion, working through the queue
 
-
+    AGHANIM_RELEASE = 1639533060
     aghs_matches = os.environ['AGHANIM_MATCHES_FUNC_NAME']
     aghs_payload = {
         "start_time": 0,

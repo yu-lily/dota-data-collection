@@ -36,21 +36,22 @@ def handler(event, context):
     api_caller = APICaller(api_calls_table)
     data = api_caller.query(query, variables, metadata)
     matches = data['data']['stratz']['page']['aghanim']['matches']
-
+    print(f'Found {len(matches)} matches')
 
     with aghs_matches_table.batch_writer() as batch:
         for match in matches:
             batch.put_item(Item=match)
 
     #If there are more matches to get, get them
-    while len(matches) == INCREMENT:
+    while len(matches) >= INCREMENT:
         variables['skip'] += INCREMENT
 
         print('Getting more matches')
         print(f'{variables["skip"]=}')
         data = api_caller.query(query, variables, metadata)
         matches = data['data']['stratz']['page']['aghanim']['matches']
-
+        print(f'Found {len(matches)} matches')
+        
         with aghs_matches_table.batch_writer() as batch:
             for match in matches:
                 batch.put_item(Item=match)

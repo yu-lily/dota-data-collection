@@ -153,9 +153,9 @@ class DotaDataCollectionStack(cdk.Stack):
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
-        #stratz_apikey.grant_read(update_players_lambda)
-        #stratz_apikey.grant_read(find_matchids_lambda)
-        stratz_apikey.grant_read(api_caller_layer)
+        stratz_apikey.grant_read(update_players_lambda)
+        stratz_apikey.grant_read(find_matchids_lambda)
+        stratz_apikey.grant_read(aghanim_matches_lambda)
 
         #ALLOW FUNCTION CALLS
         #Allow the orchestrator function to call other functions
@@ -165,9 +165,9 @@ class DotaDataCollectionStack(cdk.Stack):
 
         #API CALLS LOG DATABASE PERMISSIONS
         #Allow functions to record when the make API calls
-        #api_calls_table.grant_write_data(update_players_lambda)
-        #api_calls_table.grant_write_data(find_matchids_lambda)
-        api_calls_table.grant_write_data(api_caller_layer)
+        api_calls_table.grant_write_data(update_players_lambda)
+        api_calls_table.grant_write_data(find_matchids_lambda)
+        api_calls_table.grant_write_data(aghanim_matches_lambda)
 
         #Allow orchestrator to check the API calls table
         api_calls_table.grant_read_data(orchestrator_lambda)

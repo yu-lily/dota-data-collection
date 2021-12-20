@@ -41,6 +41,12 @@ class DotaDataCollectionStack(cdk.Stack):
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY
         )
+        aghanim_matches_table = ddb.Table(
+            self, "AghanimMatchesTable",
+            partition_key=ddb.Attribute(name="id", type=ddb.AttributeType.NUMBER),
+            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=core.RemovalPolicy.DESTROY
+        )
 
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(
@@ -56,6 +62,7 @@ class DotaDataCollectionStack(cdk.Stack):
             "PLAYERS_TABLE": players_table.table_name,
             "MATCHID_TABLE": matchid_table.table_name,
             "API_CALLS_TABLE": api_calls_table.table_name,
+            "AGHANIM_MATCHES_TABLE": aghanim_matches_table.table_name,
             "PARTITION_KEY": "player_id",
         }
 
@@ -98,9 +105,31 @@ class DotaDataCollectionStack(cdk.Stack):
             profiling=True,
             layers=[api_caller_layer],
         )
+
+        aghanim_matches_lambda = _lambda.Function(
+            self, "AghanimMatchesLambda",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler='aghanim_matches.handler',
+            code=_lambda.Code.from_asset(
+                "lambda/aghanim_matches",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment=LAMBDA_ENVS,
+            timeout=core.Duration.minutes(10),
+            profiling=True,
+            layers=[api_caller_layer],
+        )
+
         LAMBDA_FUNC_NAMES = {
             "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
             "FIND_MATCHIDS_FUNC_NAME": find_matchids_lambda.function_name,
+            "AGHANIM_MATCHES_FUNC_NAME": aghanim_matches_lambda.function_name,
         }
 
         orchestrator_lambda = _lambda.Function(
@@ -145,3 +174,5 @@ class DotaDataCollectionStack(cdk.Stack):
         players_table.grant_read_write_data(update_players_lambda)
         players_table.grant_read_data(find_matchids_lambda)
         matchid_table.grant_read_write_data(find_matchids_lambda)
+
+        

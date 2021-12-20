@@ -15,16 +15,9 @@ LOG_GROUP = os.environ['AWS_LAMBDA_LOG_GROUP_NAME']
 LOG_STREAM = os.environ['AWS_LAMBDA_LOG_STREAM_NAME']
 metadata = API_Call_Metadata(FUNC_NAME, LOG_GROUP, LOG_STREAM)
 
-query = """
-query ($region: LeaderboardDivision) {
-leaderboard {
-    season(request: {leaderBoardDivision: $region, take: 6000}) {
-    steamAccountId 
-    }
-}
-}
-"""
-
+with open('query.txt', 'r') as f:
+    query = f.read()
+    
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 

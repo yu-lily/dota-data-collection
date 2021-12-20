@@ -1,0 +1,7 @@
+query ($region: LeaderboardDivision) {
+leaderboard {
+    season(request: {leaderBoardDivision: $region, take: 6000}) {
+    steamAccountId 
+    }
+}
+}

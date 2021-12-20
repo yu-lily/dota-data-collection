@@ -29,7 +29,7 @@ def handler(event, context):
     AGHANIM_RELEASE = 1639533060
     aghs_matches = os.environ['AGHANIM_MATCHES_FUNC_NAME']
     aghs_payload = {
-        "start_time": 0,
+        "window": 1800,
         "end_time": 1639863998,
         "difficulty": "APEXMAGE",
     }

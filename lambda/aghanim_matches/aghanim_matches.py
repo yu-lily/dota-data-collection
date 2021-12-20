@@ -25,7 +25,7 @@ def handler(event, context):
     INCREMENT = 100
 
     variables = {
-        "createdAfterDateTime": event['start_time'],
+        "createdAfterDateTime": event['end_time'] - event['window'],
         "createdBeforeDateTime": event['end_time'],
         "difficulty": event['difficulty'],
         "take": INCREMENT,
@@ -51,7 +51,7 @@ def handler(event, context):
         data = api_caller.query(query, variables, metadata)
         matches = data['data']['stratz']['page']['aghanim']['matches']
         print(f'Found {len(matches)} matches')
-        
+
         with aghs_matches_table.batch_writer() as batch:
             for match in matches:
                 batch.put_item(Item=match)

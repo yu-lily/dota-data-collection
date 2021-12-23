@@ -47,6 +47,13 @@ class DotaDataCollectionStack(cdk.Stack):
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY
         )
+        aghanim_query_window_table = ddb.Table(
+            self, "AghanimQueryWindowTable",
+            partition_key=ddb.Attribute(name="start_time", type=ddb.AttributeType.NUMBER),
+            sort_key=ddb.Attribute(name="difficulty", type=ddb.AttributeType.STRING),
+            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=core.RemovalPolicy.DESTROY
+        )
 
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(
@@ -63,6 +70,7 @@ class DotaDataCollectionStack(cdk.Stack):
             "MATCHID_TABLE": matchid_table.table_name,
             "API_CALLS_TABLE": api_calls_table.table_name,
             "AGHANIM_MATCHES_TABLE": aghanim_matches_table.table_name,
+            "AGHANIM_QUERY_WINDOW_TABLE": aghanim_query_window_table.table_name,
             "PARTITION_KEY": "player_id",
         }
 
@@ -178,5 +186,6 @@ class DotaDataCollectionStack(cdk.Stack):
         players_table.grant_read_data(find_matchids_lambda)
         matchid_table.grant_read_write_data(find_matchids_lambda)
         aghanim_matches_table.grant_read_write_data(aghanim_matches_lambda)
-
+        aghanim_query_window_table.grant_read_data(orchestrator_lambda)
+        aghanim_query_window_table.grant_read_write_data(aghanim_matches_lambda)
         

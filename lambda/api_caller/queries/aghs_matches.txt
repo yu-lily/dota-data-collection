@@ -1,0 +1,89 @@
+query ($createdAfterDateTime: Long, $createdBeforeDateTime: Long, $difficulty: TI2020CustomGameMatchDifficultyType, $take:Int, $skip:Int) {
+  stratz {
+    page {
+      aghanim {
+        matches(request: {createdAfterDateTime: $createdAfterDateTime, createdBeforeDateTime: $createdBeforeDateTime, difficulty: $difficulty, take: $take, skip:$skip, minDepth: 4}) {
+          id
+          didWin
+          durationSeconds
+          startDateTime
+          endDateTime
+          clusterId
+          lobbyType
+          numKills
+          numDeaths
+          numHumanPlayers
+          gameMode
+          replaySalt
+          difficulty
+          depth
+          seed
+          battlePoints
+          score
+          arcaneFragments
+          goldBags
+          regionId
+          players {
+            matchId
+            playerSlot
+            steamAccountId
+            isVictory
+            heroId
+            deaths
+            leaverStatus
+            numLastHits
+            goldPerMinute
+            networth
+            experiencePerMinute
+            level
+            goldSpent
+            partyId
+            item0Id
+            item1Id
+            item2Id
+            item3Id
+            item4Id
+            item5Id
+            neutral0Id
+            arcaneFragments
+            bonusArcaneFragments
+            goldBags
+            neutralItemId
+            depthList {
+              numDeaths
+              goldBags
+              kills
+              level
+              networth
+              rarity
+              selectedRewardAbilityId
+              unSelectedRewardAbilityId1
+              unSelectedRewardAbilityId2
+              selectedRewardImageAbilityId
+            }
+            blessings {
+              type
+              value
+            }
+          }
+          depthList{
+            selectedElite
+            selectedEncounter
+            selectedEncounterType
+            selectedHidden
+            selectedReward
+            unselectedElite
+            unselectedEncounter
+            unselectedHidden
+            unselectedReward
+            ascensionAbilities{
+              type
+              abilityId
+              modifierId
+            }
+          }
+        }
+      }
+    }
+  }
+}

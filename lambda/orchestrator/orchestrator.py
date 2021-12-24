@@ -47,9 +47,12 @@ def handler(event, context):
 
         #Get matches
         aghs_payload = {
+            "query_type": "aghs_matches",
             "window": WINDOW_SIZE,
             "start_time": start_time,
-            "difficulty": DIFFICULTY
+            "difficulty": DIFFICULTY,
+            "take": 100, #TODO:CHANGE THESE
+            "skip": 0, #TODO:CHANGE THESE
         }
         #TODO: Push to queue instead of calling lambda
         

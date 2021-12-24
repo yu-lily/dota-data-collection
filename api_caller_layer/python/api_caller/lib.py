@@ -11,6 +11,7 @@ class API_Call_Metadata:
     func_name: str
     log_group: str
     log_stream: str
+    query_type: str
 
 
 def get_apikey(secret_name:str="stratz/apikey", region_name:str="us-west-2"):
@@ -32,13 +33,13 @@ class APICaller:
 
     def __init__(self, api_calls_table_client, endpoint: str = "https://api.stratz.com/graphql") -> None:
         self.api_calls_table_client = api_calls_table_client
-        
         self.endpoint = endpoint
-
-
         self.apikey = get_apikey()
     
-    def graphql_query(self, query, vars, metadata) -> requests.Response:
+    def graphql_query(self):
+        self.graphql_query(self.query, self.vars, self.metadata)
+
+    def graphql_query(self, query, vars, metadata) -> dict:
         endpoint = "https://api.stratz.com/graphql"
         headers = {'Authorization': 'Bearer ' + self.apikey}
         print(vars)
@@ -53,22 +54,23 @@ class APICaller:
             'function': metadata.func_name,
             'logGroup': metadata.log_group,
             'logStream': metadata.log_stream,
+            'queryType': metadata.query_type,
             'timestamp': ts,
             'statusCode': r.status_code
             }
         self.api_calls_table_client.put_item(Item=item)
         
-        return r
-
-    def query(self, query: str, variables: dict, metadata:API_Call_Metadata) -> dict:
-        """
-        Wrapper for the graphql_query function.
-        Checks the status code of the response and raises an exception if it is not 200.
-        """
-        r = self.graphql_query(query, variables, metadata)
-
         if r.status_code == 200:
             return json.loads(r.text)
         else:
             print(f"Query failed with status code: {r.status_code}")
-            print(f"Response: {r.text}") 
+            print(f"Response: {r.text}")
+            return {'errors': [{'message': r.text}]}
+
+    # def query(self, query: str, variables: dict, metadata:API_Call_Metadata) -> dict:
+    #     """
+    #     Wrapper for the graphql_query function.
+    #     Checks the status code of the response and raises an exception if it is not 200.
+    #     """
+    #     r = self.graphql_query(query, variables, metadata)
+

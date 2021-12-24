@@ -132,6 +132,7 @@ class DotaDataCollectionStack(cdk.Stack):
             timeout=core.Duration.minutes(10),
             profiling=True,
             layers=[api_caller_layer],
+            reserved_concurrent_executions = 10
         )
 
         LAMBDA_FUNC_NAMES = {

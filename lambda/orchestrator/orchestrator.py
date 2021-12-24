@@ -51,6 +51,8 @@ def handler(event, context):
             "start_time": start_time,
             "difficulty": DIFFICULTY
         }
+        #TODO: Push to queue instead of calling lambda
+        
         lambdaClient.invoke(FunctionName=AGHS_MATCHES_LAMBDA, InvocationType='Event', Payload=json.dumps(aghs_payload))
         start_time += WINDOW_SIZE
 

@@ -76,7 +76,7 @@ class DotaDataCollectionStack(cdk.Stack):
         api_caller_lambda = _lambda.Function(
             self, "APICaller",
             runtime=_lambda.Runtime.PYTHON_3_8,
-            handler="handler",
+            handler="index.handler",
             code=_lambda.Code.from_asset(
                 "lambda/api_caller",
                 bundling=core.BundlingOptions(

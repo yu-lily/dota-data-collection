@@ -8,7 +8,7 @@ class QueryHandler(ABC):
         self.query_type = query_type
         self.query = self.load_query()
 
-        self.evnet = event
+        self.event = event
 
         self.variables = {}
 

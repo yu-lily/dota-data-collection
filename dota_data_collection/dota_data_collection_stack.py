@@ -51,7 +51,8 @@ class DotaDataCollectionStack(cdk.Stack):
             partition_key=ddb.Attribute(name="start_time", type=ddb.AttributeType.NUMBER),
             sort_key=ddb.Attribute(name="difficulty", type=ddb.AttributeType.STRING),
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=core.RemovalPolicy.DESTROY
+            removal_policy=core.RemovalPolicy.DESTROY,
+            point_in_time_recovery=True,
         )
 
         # Lambda Functions

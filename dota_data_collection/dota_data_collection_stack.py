@@ -44,7 +44,8 @@ class DotaDataCollectionStack(cdk.Stack):
             self, "AghanimMatchesTable",
             partition_key=ddb.Attribute(name="id", type=ddb.AttributeType.NUMBER),
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=core.RemovalPolicy.DESTROY
+            removal_policy=core.RemovalPolicy.DESTROY,
+            point_in_time_recovery=True,
         )
         aghanim_query_window_table = ddb.Table(
             self, "AghanimQueryWindowTable",
@@ -52,7 +53,6 @@ class DotaDataCollectionStack(cdk.Stack):
             sort_key=ddb.Attribute(name="difficulty", type=ddb.AttributeType.STRING),
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY,
-            point_in_time_recovery=True,
         )
 
         # Lambda Functions

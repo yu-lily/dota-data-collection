@@ -24,7 +24,7 @@ def handler(event, context):
     HandlerClass = choose_handler(query_type)
     handler = HandlerClass(ddb_resource, query_type, event)
 
-    handler.extract_vars(event)
+    handler.extract_vars()
     handler.make_query()
     handler.write_results()
     handler.log_window()

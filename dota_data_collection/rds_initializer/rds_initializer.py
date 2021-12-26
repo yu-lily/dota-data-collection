@@ -1,20 +1,16 @@
-from aws_cdk import core as cdk
-
 from aws_cdk import (
     aws_lambda as _lambda,
-    aws_iam as iam,
     core
 )
 
-from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId
-from aws_cdk.core import CustomResource, CustomResourceProps, CustomResourceProvider, CustomResourceProviderRuntime
+from aws_cdk.custom_resources import AwsCustomResource, AwsSdkCall
 from constructs import Construct
 import json
 
 class RDSInitializer(Construct):
     function = None
 
-    def __init__(self, scope: Construct, id: str, props: CustomResourceProps, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, props, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         fn = _lambda.Function(self, "RDSInitializerProvider",

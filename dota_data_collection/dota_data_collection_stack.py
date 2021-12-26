@@ -12,6 +12,9 @@ from aws_cdk import (
     aws_iam as iam,
     core
 )
+
+from ..rds_initializer import RDSInitializer
+
 from aws_cdk.aws_lambda_event_sources import SqsEventSource
 
 class DotaDataCollectionStack(cdk.Stack):
@@ -67,12 +70,22 @@ class DotaDataCollectionStack(cdk.Stack):
 
         # Provision RDS instance for final datastore
         vpc = ec2.Vpc(self, "VPC")
+        rds_creds = rds.Credentials.from_generated_secret("aghs_rds_credentials")
+
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
             engine=rds.DatabaseInstanceEngine.POSTGRES,
             instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
-            credentials=rds.Credentials.from_generated_secret("aghs_rds_credentials"),
+            credentials=rds_creds,
             vpc=vpc,
         )
+
+        # Initalize RDS instance with tables
+        rds_initializer = RDSInitializer(self, "RDSInitializer",
+            rds_instance = aghanim_matches_db._physical_name,
+        )
+
+        aghanim_matches_db.connections.allow_default_port_from(rds_initializer.function)
+        rds_creds.secret.grant_read(rds_initializer.function)
 
 
         # Lambda Functions

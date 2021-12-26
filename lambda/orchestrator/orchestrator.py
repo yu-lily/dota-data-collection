@@ -63,6 +63,14 @@ def handler(event, context):
     #     lambdaClient.invoke(FunctionName=AGHS_MATCHES_LAMBDA, InvocationType='Event', Payload=json.dumps(aghs_payload))
     #     start_time += WINDOW_SIZE
 
+
+    BATCH_SIZE = 10
+    # Move items from staging queue to api_caller queue
+    for message in staging_queue.receive_messages(MaxNumberOfMessages=BATCH_SIZE):
+        api_caller_queue.send_message(MessageBody=json.dumps(message.body))
+        message.delete()
+
+
     # Write to api caller queue
     test_event = {
         "query_type": "aghs_matches",

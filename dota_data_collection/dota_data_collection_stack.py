@@ -104,45 +104,6 @@ class DotaDataCollectionStack(cdk.Stack):
             layers=[api_caller_layer],
         )
 
-        update_players_lambda = _lambda.Function(
-            self, "UpdatePlayersLambda",
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            handler='update_players.handler',
-            code=_lambda.Code.from_asset(
-                "lambda/update_players",
-                bundling=core.BundlingOptions(
-                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-                    command=[
-                        "bash", "-c",
-                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-                    ],
-                ),
-            ),
-            environment=LAMBDA_ENVS,
-            timeout=core.Duration.minutes(10),
-            profiling=True,
-            layers=[api_caller_layer],
-        )
-
-        find_matchids_lambda = _lambda.Function(
-            self, "FindMatchIDsLambda",
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            handler='find_matchids.handler',
-            code=_lambda.Code.from_asset(
-                "lambda/find_matchids",
-                bundling=core.BundlingOptions(
-                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-                    command=[
-                        "bash", "-c",
-                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-                    ],
-                ),
-            ),
-            environment=LAMBDA_ENVS,
-            timeout=core.Duration.minutes(10),
-            profiling=True,
-            layers=[api_caller_layer],
-        )
 
         aghanim_matches_lambda = _lambda.Function(
             self, "AghanimMatchesLambda",
@@ -165,8 +126,6 @@ class DotaDataCollectionStack(cdk.Stack):
         )
 
         LAMBDA_FUNC_NAMES = {
-            "UPDATE_PLAYERS_FUNC_NAME": update_players_lambda.function_name,
-            "FIND_MATCHIDS_FUNC_NAME": find_matchids_lambda.function_name,
             "AGHANIM_MATCHES_FUNC_NAME": aghanim_matches_lambda.function_name,
             "API_CALLER_FUNC_NAME": api_caller_lambda.function_name,
         }
@@ -190,14 +149,31 @@ class DotaDataCollectionStack(cdk.Stack):
             profiling=True,
         )
 
+        queue_populator_lambda = _lambda.Function(
+            self, "QueuePopulatorLambda",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler='queue_populator.handler',
+            code=_lambda.Code.from_asset(
+                "lambda/orchestrator",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
+            timeout=core.Duration.minutes(10),
+            profiling=True,
+        )
+
         api_caller_lambda.add_event_source(SqsEventSource(api_caller_queue,
-            batch_size=10,
+            batch_size=1,
         ))
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
-        stratz_apikey.grant_read(update_players_lambda)
-        stratz_apikey.grant_read(find_matchids_lambda)
         stratz_apikey.grant_read(aghanim_matches_lambda)
         stratz_apikey.grant_read(api_caller_lambda)
 
@@ -208,18 +184,15 @@ class DotaDataCollectionStack(cdk.Stack):
         api_caller_queue.grant_send_messages(orchestrator_lambda)
         api_caller_queue.grant_consume_messages(api_caller_lambda)
         staging_queue.grant_send_messages(api_caller_lambda)
+        staging_queue.grant_send_messages(queue_populator_lambda)
 
         #ALLOW FUNCTION CALLS
         #Allow the orchestrator function to call other functions
-        update_players_lambda.grant_invoke(orchestrator_lambda)
-        find_matchids_lambda.grant_invoke(orchestrator_lambda)
         aghanim_matches_lambda.grant_invoke(orchestrator_lambda)
         api_caller_lambda.grant_invoke(orchestrator_lambda)
 
         #API CALLS LOG DATABASE PERMISSIONS
         #Allow functions to record when the make API calls
-        api_calls_table.grant_write_data(update_players_lambda)
-        api_calls_table.grant_write_data(find_matchids_lambda)
         api_calls_table.grant_write_data(aghanim_matches_lambda)
         api_calls_table.grant_write_data(api_caller_lambda)
 
@@ -228,12 +201,13 @@ class DotaDataCollectionStack(cdk.Stack):
         
         #OTHER HELPER DATABASE PERMISSIONS
         #Give appropriate ddb read/write access to functions
-        players_table.grant_read_write_data(update_players_lambda)
-        players_table.grant_read_data(find_matchids_lambda)
-        matchid_table.grant_read_write_data(find_matchids_lambda)
+        # players_table.grant_read_write_data(update_players_lambda)
+        # players_table.grant_read_data(find_matchids_lambda)
+        # matchid_table.grant_read_write_data(find_matchids_lambda)
         aghanim_matches_table.grant_read_write_data(aghanim_matches_lambda)
         aghanim_matches_table.grant_read_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(orchestrator_lambda)
         aghanim_query_window_table.grant_read_write_data(aghanim_matches_lambda)
         aghanim_query_window_table.grant_read_write_data(api_caller_lambda)
+        aghanim_query_window_table.grant_read_data(queue_populator_lambda)
         

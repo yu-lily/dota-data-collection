@@ -10,7 +10,7 @@ import json
 class RDSInitializer(Construct):
     function = None
 
-    def __init__(self, scope: Construct, id: str, props, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         fn = _lambda.Function(self, "RDSInitializerProvider",
@@ -30,11 +30,11 @@ class RDSInitializer(Construct):
             profiling=True,
         )
 
-        payload = json.loads({
-            'params': {
-                'config': props.config
-            }
-        })
+        # payload = json.loads({
+        #     'params': {
+        #         'config': props.config
+        #     }
+        # })
 
         AwsCustomResource(self, "RDSInitializer", 
             function_name=fn.function_name,

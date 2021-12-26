@@ -16,7 +16,6 @@ def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 
     REGIONS = ['AMERICAS', 'SE_ASIA', 'EUROPE', 'CHINA']
-    update_players = os.environ['UPDATE_PLAYERS_FUNC_NAME']
     
     # for region in REGIONS:
     #     lambdaClient.invoke(FunctionName=update_players, InvocationType='Event', Payload=json.dumps({'region': region}))

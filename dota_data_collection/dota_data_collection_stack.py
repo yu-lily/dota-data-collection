@@ -5,11 +5,12 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_sqs as sqs,
     aws_events as events,
+    #aws_lambda_event_sources as event_sources,
     aws_secretsmanager as sm,
     aws_iam as iam,
     core
 )
-from aws_cdk.aws_lambda_python import PythonFunction
+from aws_cdk.aws_lambda_event_sources import SqsEventSource
 
 class DotaDataCollectionStack(cdk.Stack):
 
@@ -21,6 +22,13 @@ class DotaDataCollectionStack(cdk.Stack):
         stratz_api_caller = iam.Role(self, 'StratzAPICaller',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
 
+        # Create SQS Queue
+        staging_queue = sqs.Queue(self, 'StagingQueue',
+            visibility_timeout=core.Duration.seconds(300),
+        )
+        api_caller_queue = sqs.Queue(self, 'APICallerQueue',
+            visibility_timeout=core.Duration.seconds(300),
+        )
 
         # Create a DynamoDB table
         players_table = ddb.Table(
@@ -71,6 +79,8 @@ class DotaDataCollectionStack(cdk.Stack):
             "API_CALLS_TABLE": api_calls_table.table_name,
             "AGHANIM_MATCHES_TABLE": aghanim_matches_table.table_name,
             "AGHANIM_QUERY_WINDOW_TABLE": aghanim_query_window_table.table_name,
+            "STAGING_QUEUE": staging_queue.queue_name,
+            "API_CALLER_QUEUE": api_caller_queue.queue_name,
             "PARTITION_KEY": "player_id",
         }
 
@@ -180,12 +190,24 @@ class DotaDataCollectionStack(cdk.Stack):
             profiling=True,
         )
 
+        api_caller_lambda.add_event_source(SqsEventSource(api_caller_queue,
+            batch_size=10,
+        ))
+
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
         stratz_apikey.grant_read(update_players_lambda)
         stratz_apikey.grant_read(find_matchids_lambda)
         stratz_apikey.grant_read(aghanim_matches_lambda)
         stratz_apikey.grant_read(api_caller_lambda)
+
+        #QUEUE PERMISSIONS
+        #Give the queues access to the functions that call the API
+        staging_queue.grant_consume_messages(orchestrator_lambda)
+        staging_queue.grant_send_messages(orchestrator_lambda)
+        api_caller_queue.grant_send_messages(orchestrator_lambda)
+        api_caller_queue.grant_consume_messages(api_caller_lambda)
+        staging_queue.grant_send_messages(api_caller_lambda)
 
         #ALLOW FUNCTION CALLS
         #Allow the orchestrator function to call other functions

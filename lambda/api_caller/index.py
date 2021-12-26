@@ -15,7 +15,7 @@ def choose_handler(query_type):
 
 
 def handler(event, context):
-    print('request: {}'.format(json.dumps(event)))
+    print(f'event: {json.dumps(event)}')
 
     query_type = event['query_type']
 

@@ -11,6 +11,10 @@ lambdaClient = boto3.client('lambda', region_name="us-west-2")
 client = boto3.resource('dynamodb')
 query_window_table = client.Table(os.environ['AGHANIM_QUERY_WINDOW_TABLE'])
 
+sqs = boto3.resource('sqs')
+staging_queue = sqs.get_queue_by_name(QueueName=os.environ["STAGING_QUEUE"])
+api_caller_queue = sqs.get_queue_by_name(QueueName=os.environ["API_CALLER_QUEUE"])
+
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 

@@ -22,16 +22,20 @@ def handler(event, context):
 
     for _ in range(CYCLE_LIMIT):
         # Make sure each cycle doesn't run faster than 1/sec
-        if time.time() - last_cycle_time < 1:
-            time.sleep(1)
-        last_cycle_time = time.time()
+        gap = round((time.time_ns() - last_cycle_time) / 1000000000, 2)
+        if gap < 1:
+            time.sleep(1 - gap)
+        last_cycle_time = time.time_ns()
 
+        messages = staging_queue.receive_messages(MaxNumberOfMessages=BATCH_SIZE)
+
+        #Stop execution if queue is empty
+        if len(messages) == 0:
+            print("Queue is empty")
+            return
+            
         # Move a batch from staging queue to api_caller queue
-        for message in staging_queue.receive_messages(MaxNumberOfMessages=BATCH_SIZE):
+        for message in messages:
             print(message.body)
-            if len(message.body) == 0:
-                print("Queue is empty")
-                return
-
             api_caller_queue.send_message(MessageBody=message.body)
             message.delete()

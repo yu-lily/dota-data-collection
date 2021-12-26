@@ -13,7 +13,7 @@ from aws_cdk import (
     core
 )
 
-from rds_initializer.rds_initializer_construct import RDSInitializer
+from rds_initializer_construct import RDSInitializer
 
 from aws_cdk.aws_lambda_event_sources import SqsEventSource
 

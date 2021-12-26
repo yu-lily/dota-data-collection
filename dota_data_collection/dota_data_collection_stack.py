@@ -66,7 +66,7 @@ class DotaDataCollectionStack(cdk.Stack):
         )
 
         # Provision RDS instance for final datastore
-        vpc = core.Vpc.from_lookup(self, 'VPC', is_default=True)
+        vpc = ec2.Vpc.from_lookup(self, "VPC", is_default=True)
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
             engine=rds.DatabaseInstanceEngine.POSTGRES,
             instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),

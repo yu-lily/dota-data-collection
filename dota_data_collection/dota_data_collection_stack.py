@@ -155,7 +155,7 @@ class DotaDataCollectionStack(cdk.Stack):
         minute_rule = events.Rule(self, "MinuteRule",
             schedule=events.Schedule.cron(minute='*/1')
         )
-        #minute_rule.add_target(targets.LambdaFunction(orchestrator_lambda))
+        minute_rule.add_target(targets.LambdaFunction(orchestrator_lambda))
 
 
         #STRATZ API KEY ACCESS

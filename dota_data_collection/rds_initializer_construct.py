@@ -3,7 +3,7 @@ from aws_cdk import (
     core
 )
 
-from aws_cdk.custom_resources import AwsCustomResource, AwsSdkCall
+from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall
 from constructs import Construct
 import json
 
@@ -35,13 +35,17 @@ class RDSInitializer(Construct):
         #         'config': props.config
         #     }
         # })
-
-        AwsCustomResource(self, "RDSInitializer", 
-            function_name=fn.function_name,
-            on_create= AwsSdkCall(
+        sdk_call = AwsSdkCall(
                 service='Lambda',
                 action='invoke',
             )
+
+        AwsCustomResource(self, "RDSInitializer", 
+            function_name=fn.function_name,
+            policy=AwsCustomResourcePolicy.from_sdk_calls(
+                resources=[AwsCustomResourcePolicy.ANY_RESOURCE]
+            ),
+            on_create=sdk_call
         )
 
         self.function = fn

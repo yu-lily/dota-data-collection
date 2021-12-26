@@ -27,7 +27,7 @@ class DotaDataCollectionStack(cdk.Stack):
             visibility_timeout=core.Duration.seconds(300),
         )
         api_caller_queue = sqs.Queue(self, 'APICallerQueue',
-            visibility_timeout=core.Duration.seconds(300),
+            visibility_timeout=core.Duration.seconds(120),
         )
 
         # Create a DynamoDB table
@@ -99,7 +99,7 @@ class DotaDataCollectionStack(cdk.Stack):
                 ),
             ),
             environment=LAMBDA_ENVS,
-            timeout=core.Duration.minutes(10),
+            timeout=core.Duration.minutes(1),
             profiling=True,
             layers=[api_caller_layer],
         )

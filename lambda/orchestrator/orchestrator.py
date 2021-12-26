@@ -15,6 +15,7 @@ def handler(event, context):
 
     BATCH_SIZE = 10
     CYCLE_LIMIT = 20
+    INVOCATION_INTERVAL = 2 #seconds
     # STRATZ api limit is 250 per minute, this function is called by the minute
     # 20 batches of size 10 calls each = 200 calls/min (Staying safe amount under limit)
 
@@ -23,8 +24,8 @@ def handler(event, context):
     for _ in range(CYCLE_LIMIT):
         # Make sure each cycle doesn't run faster than 1/sec
         gap = round((time.time_ns() - last_cycle_time) / 1000000000, 2)
-        if gap < 1:
-            time.sleep(1 - gap)
+        if gap < INVOCATION_INTERVAL:
+            time.sleep(INVOCATION_INTERVAL - gap)
         last_cycle_time = time.time_ns()
 
         messages = staging_queue.receive_messages(MaxNumberOfMessages=BATCH_SIZE)

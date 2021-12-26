@@ -41,27 +41,6 @@ def handler(event, context):
     AGHS_MATCHES_LAMBDA = os.environ['AGHANIM_MATCHES_FUNC_NAME']
 
     start_time = AGHANIM_RELEASE
-    # while start_time < CURRENT_TIME - 2 * WINDOW_SIZE:
-    #     #Check if window has been handled
-    #     item = query_window_table.get_item(Key={'start_time': start_time, 'difficulty': DIFFICULTY})
-    #     if 'Item' in item:
-    #         print(f'Window {start_time}-{start_time + WINDOW_SIZE} already handled')
-    #         start_time += WINDOW_SIZE
-    #         continue
-
-    #     #Get matches
-    #     aghs_payload = {
-    #         "query_type": "aghs_matches",
-    #         "window": WINDOW_SIZE,
-    #         "start_time": start_time,
-    #         "difficulty": DIFFICULTY,
-    #         "take": 100, #TODO:CHANGE THESE
-    #         "skip": 0, #TODO:CHANGE THESE
-    #     }
-    #     #TODO: Push to queue instead of calling lambda
-        
-    #     lambdaClient.invoke(FunctionName=AGHS_MATCHES_LAMBDA, InvocationType='Event', Payload=json.dumps(aghs_payload))
-    #     start_time += WINDOW_SIZE
 
 
     BATCH_SIZE = 10

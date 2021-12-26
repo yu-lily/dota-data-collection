@@ -42,9 +42,7 @@ class RDSInitializer(Construct):
 
         AwsCustomResource(self, "RDSInitializer", 
             function_name=fn.function_name,
-            policy=AwsCustomResourcePolicy.from_sdk_calls(
-                resources=[AwsCustomResourcePolicy.ANY_RESOURCE]
-            ),
+            policy=AwsCustomResourcePolicy.ANY_RESOURCE,
             on_create=sdk_call
         )
 

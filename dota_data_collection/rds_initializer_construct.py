@@ -17,7 +17,7 @@ class RDSInitializer(Construct):
             runtime=_lambda.Runtime.PYTHON_3_8,
             handler="index.handler",
             code=_lambda.Code.from_asset(
-                "lambda",
+                "lambda/rds_initializer",
                 bundling=core.BundlingOptions(
                     image=_lambda.Runtime.PYTHON_3_8.bundling_image,
                     command=[

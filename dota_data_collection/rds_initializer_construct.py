@@ -11,7 +11,7 @@ class RDSInitializer(Construct):
     function = None
 
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
-        super().__init__(scope, id, **kwargs)
+        super().__init__(scope, id)
 
         fn = _lambda.Function(self, "RDSInitializerProvider",
             runtime=_lambda.Runtime.PYTHON_3_8,

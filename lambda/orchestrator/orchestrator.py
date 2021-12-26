@@ -19,8 +19,9 @@ def handler(event, context):
     # 20 batches of size 10 calls each = 200 calls/min (Staying safe amount under limit)
 
 
-    staging_queue
+    
     # Move items from staging queue to api_caller queue
     for message in staging_queue.receive_messages(MaxNumberOfMessages=BATCH_SIZE):
-        api_caller_queue.send_message(MessageBody=json.dumps(message.body))
+        print(json.loads(message))
+        api_caller_queue.send_message(MessageBody=message.body)
         message.delete()

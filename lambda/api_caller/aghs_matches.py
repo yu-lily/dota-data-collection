@@ -76,4 +76,4 @@ class AghsMatchesHandler(QueryHandler):
         }
 
         print(f'Queueing next query: {json.dumps(aghs_payload)}')
-        self.staging_queue.send_message(MessageBody=aghs_payload)
+        self.staging_queue.send_message(MessageBody=json.dumps(aghs_payload))

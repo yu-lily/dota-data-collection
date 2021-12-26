@@ -123,7 +123,7 @@ class DotaDataCollectionStack(cdk.Stack):
                 ),
             ),
             environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
-            timeout=core.Duration.minutes(10),
+            timeout=core.Duration.seconds(50),
             profiling=True,
         )
 

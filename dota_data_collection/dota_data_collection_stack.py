@@ -7,6 +7,8 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
     aws_secretsmanager as sm,
+    aws_ec2 as ec2,
+    aws_rds as rds,
     aws_iam as iam,
     core
 )
@@ -62,6 +64,16 @@ class DotaDataCollectionStack(cdk.Stack):
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY,
         )
+
+        # Provision RDS instance for final datastore
+        vpc = core.Vpc.from_lookup(self, 'VPC', is_default=True)
+        aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
+            engine=rds.DatabaseInstanceEngine.POSTGRES,
+            instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
+            credentials=rds.Credentials.from_generated_secret("aghs_rds_credentials"),
+            vpc=vpc,
+        )
+
 
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(

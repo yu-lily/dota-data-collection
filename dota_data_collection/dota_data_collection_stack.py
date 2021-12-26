@@ -5,7 +5,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_sqs as sqs,
     aws_events as events,
-    #aws_lambda_event_sources as event_sources,
+    aws_events_targets as targets,
     aws_secretsmanager as sm,
     aws_iam as iam,
     core
@@ -146,9 +146,17 @@ class DotaDataCollectionStack(cdk.Stack):
             profiling=True,
         )
 
+        # LAMBDA EVENTS
+        # Attach api caller lambda to SQS queue
         api_caller_lambda.add_event_source(SqsEventSource(api_caller_queue,
             batch_size=1,
         ))
+        # Run orchestrator every minute
+        minute_rule = events.Rule(self, "MinuteRule",
+            schedule=events.Schedule.cron(minute='*/1')
+        )
+        #minute_rule.add_target(targets.LambdaFunction(orchestrator_lambda))
+
 
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
@@ -179,7 +187,7 @@ class DotaDataCollectionStack(cdk.Stack):
         # players_table.grant_read_write_data(update_players_lambda)
         # players_table.grant_read_data(find_matchids_lambda)
         # matchid_table.grant_read_write_data(find_matchids_lambda)
-        aghanim_matches_table.grant_read_data(api_caller_lambda)
+        aghanim_matches_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(orchestrator_lambda)
         aghanim_query_window_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(queue_populator_lambda)

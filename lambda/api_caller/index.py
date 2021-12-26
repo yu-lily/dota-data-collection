@@ -16,6 +16,8 @@ def choose_handler(query_type):
 
 def handler(event, context):
     print(f'event: {json.dumps(event)}')
+    #Read from SQS queue event
+    event = json.loads(event['Records'][0]['body'])
 
     query_type = event['query_type']
 

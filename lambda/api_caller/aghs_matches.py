@@ -1,10 +1,10 @@
 import os
-
+import json
 from query_handler import QueryHandler
 from api_caller.lib import APICaller, API_Call_Metadata
 
 class AghsMatchesHandler(QueryHandler):
-    def __init__(self, ddb_resource, query_type, event) -> None:
+    def __init__(self, ddb_resource, query_type, event, staging_queue) -> None:
         super().__init__(ddb_resource, query_type, event)
 
         #Load additional tables
@@ -12,6 +12,8 @@ class AghsMatchesHandler(QueryHandler):
         self.old_errors = 0
         self.get_existing_log()
         self.reached_end = False
+        
+        self.staging_queue = staging_queue
 
         self.output_table = ddb_resource.Table(os.environ['AGHANIM_MATCHES_TABLE'])
 
@@ -63,10 +65,15 @@ class AghsMatchesHandler(QueryHandler):
     def queue_next_query(self):
         if self.reached_end:
             return
-
-        self.variables['skip'] += self.variables['take']
-        print(f'skip={self.variables["skip"]}')
-        self.variables['query_type'] = self.query_type
-
        
-        #TODO: Push to some queue
+        aghs_payload = {
+            "query_type": self.query_type,
+            "window": self.event['window'],
+            "start_time": self.event['start_time'],
+            "difficulty": self.event['difficulty'],
+            "take": self.event['take'],
+            "skip": self.event['take'] + self.event['skip']
+        }
+
+        print(f'Queueing next query: {json.dumps(aghs_payload)}')
+        self.staging_queue.send_message(MessageBody=aghs_payload)

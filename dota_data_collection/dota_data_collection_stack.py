@@ -70,7 +70,8 @@ class DotaDataCollectionStack(cdk.Stack):
 
         # Provision RDS instance for final datastore
         vpc = ec2.Vpc(self, "VPC")
-        rds_creds = rds.Credentials.from_generated_secret("aghs_rds_credentials")
+        RDS_SECRET_NAME = "aghs/rds"
+        rds_creds = rds.Credentials.from_generated_secret("aghs_rds_credentials", secret_name=RDS_SECRET_NAME)
 
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
             engine=rds.DatabaseInstanceEngine.postgres(version=rds.PostgresEngineVersion.VER_11_5),
@@ -96,6 +97,7 @@ class DotaDataCollectionStack(cdk.Stack):
             props = RDSInitializerProps(
                 vpc = vpc,
                 rds_creds = rds_creds,
+                rds_creds_name = RDS_SECRET_NAME,
                 db_endpoint = aghanim_matches_db_proxy,
             )
         )

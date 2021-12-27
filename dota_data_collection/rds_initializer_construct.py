@@ -16,6 +16,7 @@ from dataclasses import dataclass
 class RDSInitializerProps:
     vpc: ec2.Vpc
     rds_creds: rds.Credentials
+    rds_creds_name: str
     db_endpoint: rds.DatabaseProxy
 
 class RDSInitializer(cdk.Construct):
@@ -58,7 +59,7 @@ class RDSInitializer(cdk.Construct):
 
 
         AwsCustomResource(self, "RDSInitializerResource", 
-            function_name=fn.function_name,
+            #function_name=fn.function_name,
             policy=AwsCustomResourcePolicy.from_sdk_calls(
                 resources=AwsCustomResourcePolicy.ANY_RESOURCE
             ),

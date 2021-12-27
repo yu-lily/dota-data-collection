@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+concurrency:
+  group: dota-project-cdk-deploy
   
 jobs:
   aws_cdk:

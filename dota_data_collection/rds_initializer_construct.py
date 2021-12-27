@@ -45,7 +45,7 @@ class RDSInitializer(cdk.Construct):
                 service='Lambda',
                 action='invoke',
                 parameters={
-                    'FunctionName': fn.function_arn,
+                    'FunctionName': fn.function_name,
                 },
                 physical_resource_id=PhysicalResourceId.of("id")
             )

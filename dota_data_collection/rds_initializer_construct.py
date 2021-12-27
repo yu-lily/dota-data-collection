@@ -1,9 +1,10 @@
+from aws_cdk import core as cdk
+
 from aws_cdk import (
     aws_lambda as _lambda,
     aws_ec2 as ec2,
     aws_rds as rds,
     core,
-    Stack
 )
 
 from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId, Provider
@@ -17,7 +18,7 @@ class RDSInitializerProps:
     vpc: ec2.Vpc
     rds_creds: rds.Credentials
 
-class RDSInitializer(Stack):
+class RDSInitializer(cdk.Stack):
 
     def __init__(self, scope: Construct, id: str, props: RDSInitializerProps, **kwargs) -> None:
         super().__init__(scope, id)

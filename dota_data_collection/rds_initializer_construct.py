@@ -6,8 +6,7 @@ from aws_cdk import (
     aws_rds as rds,
     core,
 )
-
-from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId, Provider
+from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId
 from constructs import Construct
 import json
 
@@ -17,11 +16,17 @@ from dataclasses import dataclass
 class RDSInitializerProps:
     vpc: ec2.Vpc
     rds_creds: rds.Credentials
+    db_endpoint: str
 
 class RDSInitializer(cdk.Construct):
 
     def __init__(self, scope: Construct, id: str, props: RDSInitializerProps, **kwargs) -> None:
         super().__init__(scope, id)
+
+        LAMBDA_ENVS = {
+            "rds_creds": props.rds_creds,
+            "db_endpoint": props.db_endpoint,
+        }
 
         fn = _lambda.Function(self, "RDSInitializerProvider",
             runtime=_lambda.Runtime.PYTHON_3_8,
@@ -36,6 +41,7 @@ class RDSInitializer(cdk.Construct):
                     ],
                 ),
             ),
+            environment=LAMBDA_ENVS,
             timeout=core.Duration.minutes(1),
             profiling=True,
             vpc = props.vpc,
@@ -47,7 +53,7 @@ class RDSInitializer(cdk.Construct):
                 parameters={
                     'FunctionName': fn.function_name,
                 },
-                physical_resource_id=PhysicalResourceId.of("id")
+                physical_resource_id=PhysicalResourceId.of(f"{id}-{fn.function_name}-sdkCall"),
             )
 
 

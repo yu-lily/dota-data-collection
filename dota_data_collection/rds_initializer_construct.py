@@ -39,16 +39,11 @@ class RDSInitializer(Construct):
             vpc = props.vpc,
         )
 
-        # payload = json.loads({
-        #     'params': {
-        #         'config': props.config
-        #     }
-        # })
         sdk_call = AwsSdkCall(
                 service='Lambda',
                 action='invoke',
                 parameters={
-                    'FunctionName': fn.function_name,
+                    'FunctionName': fn,
                 },
                 physical_resource_id=PhysicalResourceId.of("id")
             )

@@ -25,8 +25,8 @@ class RDSInitializer(cdk.Construct):
         super().__init__(scope, id)
 
         LAMBDA_ENVS = {
-            #"rds_creds": props.rds_creds.secret_name,
-            "db_endpoint": props.db_endpoint.to_string(),
+            "rds_creds_name": props.rds_creds_name,
+            "db_endpoint": props.db_endpoint.endpoint,
         }
         print(LAMBDA_ENVS)
         fn = _lambda.Function(self, "RDSInitializerProvider",

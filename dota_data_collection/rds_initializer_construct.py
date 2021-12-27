@@ -18,7 +18,7 @@ class RDSInitializerProps:
     vpc: ec2.Vpc
     rds_creds: rds.Credentials
 
-class RDSInitializer(cdk.Stack):
+class RDSInitializer(cdk.Construct):
 
     def __init__(self, scope: Construct, id: str, props: RDSInitializerProps, **kwargs) -> None:
         super().__init__(scope, id)

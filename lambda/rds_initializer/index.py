@@ -12,7 +12,7 @@ def handler(event, context):
 
     #client = session.client(service_name='secretsmanager', region_name=event['region'])
     client = session.client(service_name='secretsmanager', region_name='us-west-2')
-    get_secret_value_response = client.get_secret_value(SecretId=os.environ['rds_creds'])
+    get_secret_value_response = client.get_secret_value(SecretId=os.environ['rds_creds_name'])
 
     secret = get_secret_value_response['SecretString']
 

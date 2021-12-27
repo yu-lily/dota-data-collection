@@ -1,4 +1,4 @@
-import psycopg2
+#import psycopg2
 
 def handler(event, context):
-    pass
+    return 'Hello World'

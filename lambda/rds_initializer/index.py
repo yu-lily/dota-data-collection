@@ -1,7 +1,6 @@
 import psycopg2
 import os
 import boto3
-import aws
 
 # Create a Secrets Manager client
 session = boto3.session.Session()

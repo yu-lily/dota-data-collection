@@ -89,6 +89,9 @@ class DotaDataCollectionStack(cdk.Stack):
         #     vpc=vpc,
         #     )
         
+
+        print(vpc)
+        print(rds_creds)
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
             # rds_instance = aghanim_matches_db._physical_name,

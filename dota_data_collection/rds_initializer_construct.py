@@ -17,7 +17,6 @@ class RDSInitializerProps:
     rds_creds: rds.Credentials
 
 class RDSInitializer(Construct):
-    function = None
 
     def __init__(self, scope: Construct, id: str, props: RDSInitializerProps, **kwargs) -> None:
         super().__init__(scope, id)

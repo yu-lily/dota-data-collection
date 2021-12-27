@@ -88,8 +88,8 @@ class DotaDataCollectionStack(cdk.Stack):
             )
         )
 
-        aghanim_matches_db.connections.allow_default_port_from(rds_initializer.function)
-        rds_creds.secret.grant_read(rds_initializer.function)
+        aghanim_matches_db.connections.allow_default_port_from(rds_initializer.get_function())
+        rds_creds.secret.grant_read(rds_initializer.get_function())
 
 
         # Lambda Functions

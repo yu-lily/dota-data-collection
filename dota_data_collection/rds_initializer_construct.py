@@ -58,7 +58,7 @@ class RDSInitializer(cdk.Construct):
             )
 
 
-        AwsCustomResource(self, "RDSInitializerResource", 
+        custom_resource = AwsCustomResource(self, "RDSInitializerResource", 
             #function_name=fn.function_name,
             policy=AwsCustomResourcePolicy.from_sdk_calls(
                 resources=AwsCustomResourcePolicy.ANY_RESOURCE
@@ -66,6 +66,7 @@ class RDSInitializer(cdk.Construct):
             on_create=sdk_call
         )
 
+        fn.grant_invoke(custom_resource)
         self.function = fn
 
     def get_function(self):

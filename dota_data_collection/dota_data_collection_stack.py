@@ -82,6 +82,9 @@ class DotaDataCollectionStack(cdk.Stack):
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
             rds_instance = aghanim_matches_db._physical_name,
+            props = {
+                'vpc': vpc,
+            }
         )
 
         aghanim_matches_db.connections.allow_default_port_from(rds_initializer.function)

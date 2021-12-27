@@ -10,7 +10,7 @@ import json
 class RDSInitializer(Construct):
     function = None
 
-    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, props, **kwargs) -> None:
         super().__init__(scope, id)
 
         fn = _lambda.Function(self, "RDSInitializerProvider",
@@ -28,6 +28,7 @@ class RDSInitializer(Construct):
             ),
             timeout=core.Duration.minutes(1),
             profiling=True,
+            vpc = props.vpc,
         )
 
         # payload = json.loads({

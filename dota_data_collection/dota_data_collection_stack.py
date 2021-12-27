@@ -80,6 +80,7 @@ class DotaDataCollectionStack(cdk.Stack):
             instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
             credentials=rds_creds,
             vpc=vpc,
+            publicly_accessible=True,
         )
 
         aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',

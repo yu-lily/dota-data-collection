@@ -16,7 +16,7 @@ from dataclasses import dataclass
 class RDSInitializerProps:
     vpc: ec2.Vpc
     rds_creds: rds.Credentials
-    db_endpoint: str
+    db_endpoint: rds.DatabaseProxy
 
 class RDSInitializer(cdk.Construct):
 
@@ -25,7 +25,7 @@ class RDSInitializer(cdk.Construct):
 
         LAMBDA_ENVS = {
             "rds_creds": props.rds_creds.secret_name,
-            "db_endpoint": props.db_endpoint,
+            "db_endpoint": props.db_endpoint.to_string(),
         }
 
         fn = _lambda.Function(self, "RDSInitializerProvider",

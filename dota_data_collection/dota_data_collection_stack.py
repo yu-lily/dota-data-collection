@@ -89,9 +89,6 @@ class DotaDataCollectionStack(cdk.Stack):
         #     vpc=vpc,
         #     )
         
-
-        print(vpc)
-        print(rds_creds)
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
             # rds_instance = aghanim_matches_db._physical_name,
@@ -101,7 +98,7 @@ class DotaDataCollectionStack(cdk.Stack):
             )
         )
 
-        # aghanim_matches_db_proxy.grant_connect(rds_initializer.get_function())
+        aghanim_matches_db_proxy.grant_connect(rds_initializer.get_function())
         #aghanim_matches_db.connections.allow_default_port_from(rds_initializer.get_function())
         #rds_creds.secret.grant_read(rds_initializer.get_function())s
 

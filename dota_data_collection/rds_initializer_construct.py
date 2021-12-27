@@ -41,23 +41,23 @@ class RDSInitializer(cdk.Construct):
             vpc = props.vpc,
         )
 
-    #     sdk_call = AwsSdkCall(
-    #             service='Lambda',
-    #             action='invoke',
-    #             parameters={
-    #                 'FunctionName': fn.function_arn,
-    #             },
-    #             physical_resource_id=PhysicalResourceId.of("id")
-    #         )
+        sdk_call = AwsSdkCall(
+                service='Lambda',
+                action='invoke',
+                parameters={
+                    'FunctionName': fn.function_arn,
+                },
+                physical_resource_id=PhysicalResourceId.of("id")
+            )
 
 
-    #     AwsCustomResource(self, "RDSInitializerResource", 
-    #         #function_name=fn.function_name,
-    #         policy=AwsCustomResourcePolicy.from_sdk_calls(
-    #             resources=AwsCustomResourcePolicy.ANY_RESOURCE
-    #         ),
-    #         on_create=sdk_call
-    #     )
+        AwsCustomResource(self, "RDSInitializerResource", 
+            function_name=fn.function_name,
+            policy=AwsCustomResourcePolicy.from_sdk_calls(
+                resources=AwsCustomResourcePolicy.ANY_RESOURCE
+            ),
+            on_create=sdk_call
+        )
 
         self.function = fn
 

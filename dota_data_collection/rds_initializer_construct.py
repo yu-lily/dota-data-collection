@@ -1,5 +1,7 @@
 from aws_cdk import (
     aws_lambda as _lambda,
+    aws_ec2 as ec2,
+    aws_rds as rds,
     core
 )
 
@@ -7,10 +9,17 @@ from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy,
 from constructs import Construct
 import json
 
+from dataclasses import dataclass
+
+@dataclass
+class RDSInitializerProps:
+    vpc: ec2.Vpc
+    rds_creds: rds.Credentials
+
 class RDSInitializer(Construct):
     function = None
 
-    def __init__(self, scope: Construct, id: str, props, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, props: RDSInitializerProps, **kwargs) -> None:
         super().__init__(scope, id)
 
         fn = _lambda.Function(self, "RDSInitializerProvider",

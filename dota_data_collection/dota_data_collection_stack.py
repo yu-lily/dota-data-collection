@@ -13,7 +13,7 @@ from aws_cdk import (
     core
 )
 
-from .rds_initializer_construct import RDSInitializer
+from .rds_initializer_construct import RDSInitializer, RDSInitializerProps
 
 from aws_cdk.aws_lambda_event_sources import SqsEventSource
 
@@ -82,9 +82,10 @@ class DotaDataCollectionStack(cdk.Stack):
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
             rds_instance = aghanim_matches_db._physical_name,
-            props = {
-                'vpc': vpc,
-            }
+            props = RDSInitializerProps(
+                vpc = vpc,
+                rds_creds = rds_creds,
+            )
         )
 
         aghanim_matches_db.connections.allow_default_port_from(rds_initializer.function)

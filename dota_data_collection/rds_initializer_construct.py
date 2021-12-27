@@ -5,7 +5,7 @@ from aws_cdk import (
     core
 )
 
-from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId
+from aws_cdk.custom_resources import AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId, Provider
 from constructs import Construct
 import json
 
@@ -43,10 +43,15 @@ class RDSInitializer(Construct):
                 service='Lambda',
                 action='invoke',
                 parameters={
-                    'FunctionName': fn,
+                    'FunctionName': fn.function_arn,
                 },
                 physical_resource_id=PhysicalResourceId.of("id")
             )
+
+        # provider = Provider(self, "RDSInitializerProvider",
+        #     on_event_handler=fn
+        # )
+
 
         AwsCustomResource(self, "RDSInitializerResource", 
             #function_name=fn.function_name,

@@ -79,8 +79,6 @@ class DotaDataCollectionStack(cdk.Stack):
             vpc=vpc,
         )
 
-        print(aghanim_matches_db.secret)
-
         aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',
             secrets=[aghanim_matches_db.secret],
             vpc=vpc,

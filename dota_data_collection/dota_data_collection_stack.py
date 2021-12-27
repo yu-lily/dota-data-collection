@@ -79,11 +79,17 @@ class DotaDataCollectionStack(cdk.Stack):
             vpc=vpc,
         )
 
-        aghanim_matches_db_proxy = rds.DatabaseProxy(self, 'AghanimMatchesDBProxy',
-            proxy_target=rds.ProxyTarget.from_instance(aghanim_matches_db),
+        print(aghanim_matches_db.secret)
+
+        aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',
             secrets=[aghanim_matches_db.secret],
             vpc=vpc,
-            )
+        )
+        # aghanim_matches_db_proxy = rds.DatabaseProxy(self, 'AghanimMatchesDBProxy',
+        #     proxy_target=rds.ProxyTarget.from_instance(aghanim_matches_db),
+        #     secrets=[aghanim_matches_db.secret],
+        #     vpc=vpc,
+        #     )
         
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",

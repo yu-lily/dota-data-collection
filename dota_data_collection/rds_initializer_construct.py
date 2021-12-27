@@ -42,9 +42,9 @@ class RDSInitializer(Construct):
         sdk_call = AwsSdkCall(
                 service='Lambda',
                 action='invoke',
-                parameters={
-                    'FunctionName': fn.function_arn,
-                },
+                # parameters={
+                #     'FunctionName': fn.function_arn,
+                # },
                 physical_resource_id=PhysicalResourceId.of("id")
             )
 

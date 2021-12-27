@@ -47,11 +47,14 @@ class RDSInitializer(Construct):
         sdk_call = AwsSdkCall(
                 service='Lambda',
                 action='invoke',
+                parameters={
+                    'FunctionName': fn.function_name,
+                },
                 physical_resource_id=PhysicalResourceId.of("id")
             )
 
         AwsCustomResource(self, "RDSInitializerResource", 
-            function_name=fn.function_name,
+            #function_name=fn.function_name,
             policy=AwsCustomResourcePolicy.from_sdk_calls(
                 resources=AwsCustomResourcePolicy.ANY_RESOURCE
             ),

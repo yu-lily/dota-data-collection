@@ -23,23 +23,23 @@ class RDSInitializer(cdk.Construct):
     def __init__(self, scope: Construct, id: str, props: RDSInitializerProps, **kwargs) -> None:
         super().__init__(scope, id)
 
-        # fn = _lambda.Function(self, "RDSInitializerProvider",
-        #     runtime=_lambda.Runtime.PYTHON_3_8,
-        #     handler="index.handler",
-        #     code=_lambda.Code.from_asset(
-        #         "lambda/rds_initializer",
-        #         bundling=core.BundlingOptions(
-        #             image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-        #             command=[
-        #                 "bash", "-c",
-        #                 "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-        #             ],
-        #         ),
-        #     ),
-        #     timeout=core.Duration.minutes(1),
-        #     profiling=True,
-        #     vpc = props.vpc,
-        # )
+        fn = _lambda.Function(self, "RDSInitializerProvider",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(
+                "lambda/rds_initializer",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            timeout=core.Duration.minutes(1),
+            profiling=True,
+            vpc = props.vpc,
+        )
 
     #     sdk_call = AwsSdkCall(
     #             service='Lambda',
@@ -59,7 +59,7 @@ class RDSInitializer(cdk.Construct):
     #         on_create=sdk_call
     #     )
 
-    #     self.function = fn
+        self.function = fn
 
-    # def get_function(self):
-    #     return self.function
+    def get_function(self):
+        return self.function

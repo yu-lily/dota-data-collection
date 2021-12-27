@@ -79,6 +79,12 @@ class DotaDataCollectionStack(cdk.Stack):
             vpc=vpc,
         )
 
+        aghanim_matches_db_proxy = rds.DatabaseProxy(self, 'AghanimMatchesDBProxy',
+            proxy_target=rds.ProxyTarget.from_instance(aghanim_matches_db),
+            secrets=[aghanim_matches_db.secret],
+            vpc=vpc,
+            )
+        
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
             rds_instance = aghanim_matches_db._physical_name,
@@ -88,7 +94,8 @@ class DotaDataCollectionStack(cdk.Stack):
             )
         )
 
-        aghanim_matches_db.connections.allow_default_port_from(rds_initializer.get_function())
+        aghanim_matches_db_proxy.grant_connect(rds_initializer.get_function())
+        #aghanim_matches_db.connections.allow_default_port_from(rds_initializer.get_function())
         rds_creds.secret.grant_read(rds_initializer.get_function())
 
 

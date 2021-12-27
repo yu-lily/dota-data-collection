@@ -59,6 +59,6 @@ class RDSInitializer(Construct):
         )
 
         self.function = fn
-    
+
     def get_function(self):
         return self.function

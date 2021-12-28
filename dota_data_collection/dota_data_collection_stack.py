@@ -92,6 +92,7 @@ class DotaDataCollectionStack(cdk.Stack):
             credentials=rds_creds,
             vpc=vpc,
             security_groups=[db_connection_group],
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
         )
 
         aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',

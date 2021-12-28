@@ -60,7 +60,19 @@ class DotaDataCollectionStack(cdk.Stack):
         )
 
         # Provision RDS instance for final datastore
-        vpc = ec2.Vpc(self, "VPC", nat_gateways=None)
+        vpc = ec2.Vpc(self, "VPC", nat_gateways=0,
+            subnet_configuration=[
+                ec2.SubnetConfiguration(
+                    name='ingress',
+                    subnet_type=ec2.SubnetType.PUBLIC,
+                    cidr_mask=24
+                ),
+                ec2.SubnetConfiguration(
+                    name='rds',
+                    subnet_type=ec2.SubnetType.PUBLIC,
+                    cidr_mask=24
+                )
+            ])
         RDS_SECRET_NAME = "aghs/rds-creds"
         DATABASE_NAME = 'aghs_matches'
         rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='aghs_rds', secret_name=RDS_SECRET_NAME)

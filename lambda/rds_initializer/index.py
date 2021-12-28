@@ -17,9 +17,6 @@ def handler(event, context):
     secret = get_secret_value_response['SecretString']
     secret = json.loads(secret)
 
-    print(secret)
-
-
     conn = psycopg2.connect(
         host = os.environ['db_endpoint'],
         database=secret['dbname'],
@@ -28,14 +25,19 @@ def handler(event, context):
     )
     cur = conn.cursor()
 
-
+    #Get all tables
     cur.execute("""SELECT table_name
     FROM information_schema.tables
     WHERE table_schema='public'
     AND table_type='BASE TABLE';""")
 
-    for table in cur.fetchall():
-        print(table)
+    tables = cur.fetchall()
+    print(tables)
+
+    #Create tables
+    if "matches" not in tables:
+        cur.execute(open("aghs_schema.sql", "r").read())
+        conn.commit()
 
     cur.close()
     conn.close()

@@ -24,8 +24,6 @@ class DotaDataCollectionStack(cdk.Stack):
 
         # Handle Stratz API Key
         stratz_apikey = sm.Secret.from_secret_name_v2(self, "StratzAPIKey", secret_name="stratz/apikey")
-        stratz_api_caller = iam.Role(self, 'StratzAPICaller',
-            assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
 
         # Create SQS Queue
         staging_queue = sqs.Queue(self, 'StagingQueue',
@@ -53,13 +51,6 @@ class DotaDataCollectionStack(cdk.Stack):
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY
         )
-        aghanim_matches_table = ddb.Table(
-            self, "AghanimMatchesTable",
-            partition_key=ddb.Attribute(name="id", type=ddb.AttributeType.NUMBER),
-            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=core.RemovalPolicy.DESTROY,
-            point_in_time_recovery=True,
-        )
         aghanim_query_window_table = ddb.Table(
             self, "AghanimQueryWindowTable",
             partition_key=ddb.Attribute(name="start_time", type=ddb.AttributeType.NUMBER),
@@ -82,7 +73,6 @@ class DotaDataCollectionStack(cdk.Stack):
         db_connection_group.add_ingress_rule(db_connection_group,ec2.Port.tcp(5432), 'allow db connection')
         db_connection_group.add_ingress_rule(lambda_to_proxy_group, ec2.Port.tcp(5432), 'allow lambda connection')
 
-
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
             database_name=DATABASE_NAME,
             engine=rds.DatabaseInstanceEngine.postgres(version=rds.PostgresEngineVersion.VER_11_5),
@@ -97,15 +87,8 @@ class DotaDataCollectionStack(cdk.Stack):
             secrets=[aghanim_matches_db.secret],
             vpc=vpc,
             security_groups=[db_connection_group],
-            #vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
         )
-        # aghanim_matches_db_proxy = rds.DatabaseProxy(self, 'AghanimMatchesDBProxy',
-        #     proxy_target=rds.ProxyTarget.from_instance(aghanim_matches_db),
-        #     secrets=[aghanim_matches_db.secret],
-        #     vpc=vpc,
-        #     )
 
-        print(aghanim_matches_db_proxy.endpoint)
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
             props = RDSInitializerProps(
@@ -118,9 +101,7 @@ class DotaDataCollectionStack(cdk.Stack):
         )
 
         aghanim_matches_db_proxy.grant_connect(rds_initializer.get_function())
-        #aghanim_matches_db.connections.allow_default_port_from(rds_initializer.get_function())
         rds_secret.grant_read(rds_initializer.get_function())
-
 
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(
@@ -136,11 +117,13 @@ class DotaDataCollectionStack(cdk.Stack):
             "PLAYERS_TABLE": players_table.table_name,
             "MATCHID_TABLE": matchid_table.table_name,
             "API_CALLS_TABLE": api_calls_table.table_name,
-            "AGHANIM_MATCHES_TABLE": aghanim_matches_table.table_name,
             "AGHANIM_QUERY_WINDOW_TABLE": aghanim_query_window_table.table_name,
+
             "STAGING_QUEUE": staging_queue.queue_name,
             "API_CALLER_QUEUE": api_caller_queue.queue_name,
-            "PARTITION_KEY": "player_id",
+            
+            "RDS_CREDS_NAME": RDS_SECRET_NAME,
+            "AGHANIM_MATCHES_DB_ENDPOINT": aghanim_matches_db_proxy.endpoint,
         }
 
         api_caller_lambda = _lambda.Function(
@@ -158,9 +141,11 @@ class DotaDataCollectionStack(cdk.Stack):
                 ),
             ),
             environment=LAMBDA_ENVS,
-            timeout=core.Duration.minutes(1),
+            timeout=core.Duration.minutes(3),
             profiling=True,
             layers=[api_caller_layer],
+            vpc=vpc,
+            security_groups=[lambda_to_proxy_group],
         )
 
         LAMBDA_FUNC_NAMES = {
@@ -220,6 +205,7 @@ class DotaDataCollectionStack(cdk.Stack):
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
         stratz_apikey.grant_read(api_caller_lambda)
+        rds_secret.grant_read(api_caller_lambda)
 
         #QUEUE PERMISSIONS
         #Give the queues access to the functions that call the API
@@ -246,8 +232,9 @@ class DotaDataCollectionStack(cdk.Stack):
         # players_table.grant_read_write_data(update_players_lambda)
         # players_table.grant_read_data(find_matchids_lambda)
         # matchid_table.grant_read_write_data(find_matchids_lambda)
-        aghanim_matches_table.grant_read_write_data(api_caller_lambda)
+        #aghanim_matches_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(orchestrator_lambda)
         aghanim_query_window_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(queue_populator_lambda)
+        aghanim_matches_db_proxy.grant_connect(api_caller_lambda)
         

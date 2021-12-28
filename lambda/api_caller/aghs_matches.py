@@ -15,7 +15,7 @@ class AghsMatchesHandler(QueryHandler):
         
         self.staging_queue = staging_queue
 
-        self.output_table = ddb_resource.Table(os.environ['AGHANIM_MATCHES_TABLE'])
+        #self.output_table = ddb_resource.Table(os.environ['AGHANIM_MATCHES_TABLE'])
 
     def get_existing_log(self):
         item = self.query_window_table.get_item(Key={'start_time': self.event['start_time'], 'difficulty': self.event['difficulty']})
@@ -44,7 +44,8 @@ class AghsMatchesHandler(QueryHandler):
 
         with self.output_table.batch_writer() as batch:
             for match in self.matches:
-                batch.put_item(Item=match)
+                print(f'Writing item: {match}')
+                #batch.put_item(Item=match)
         return self.matches
 
     def get_errors(self):

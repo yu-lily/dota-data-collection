@@ -46,6 +46,7 @@ class RDSInitializer(cdk.Construct):
             timeout=core.Duration.minutes(5),
             profiling=True,
             vpc = props.vpc,
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
         )
 
         sdk_call = AwsSdkCall(

@@ -72,7 +72,7 @@ class DotaDataCollectionStack(cdk.Stack):
         vpc = ec2.Vpc(self, "VPC")
         RDS_SECRET_NAME = "aghs/rds-creds"
         DATABASE_NAME = 'aghs_matches'
-        rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='admin', secret_name=RDS_SECRET_NAME)
+        rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='aghs_rds', secret_name=RDS_SECRET_NAME)
         rds_creds = rds.Credentials.from_secret(rds_secret)
 
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',

@@ -71,6 +71,11 @@ class DotaDataCollectionStack(cdk.Stack):
                     name='rds',
                     subnet_type=ec2.SubnetType.PUBLIC,
                     cidr_mask=24
+                ),
+                ec2.SubnetConfiguration(
+                    name='lambda',
+                    subnet_type=ec2.SubnetType.ISOLATED,
+                    cidr_mask=24
                 )
             ])
         RDS_SECRET_NAME = "aghs/rds-creds"

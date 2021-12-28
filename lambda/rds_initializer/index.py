@@ -10,8 +10,8 @@ def handler(event, context):
     print(event)
     print(f'DB Proxy str representation: {os.environ["db_endpoint"]}')
 
-    client = session.client(service_name='secretsmanager', region_name='us-west-2')
-    get_secret_value_response = client.get_secret_value(SecretId=os.environ['rds_creds_name'])
+    sm_client = session.client(service_name='secretsmanager', region_name='us-west-2')
+    get_secret_value_response = sm_client.get_secret_value(SecretId=os.environ['rds_creds_name'])
 
     secret = get_secret_value_response['SecretString']
     secret = json.loads(secret)

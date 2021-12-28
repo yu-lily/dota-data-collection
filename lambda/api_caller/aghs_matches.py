@@ -4,7 +4,7 @@ from query_handler import QueryHandler
 from api_caller.lib import APICaller, API_Call_Metadata
 
 class AghsMatchesHandler(QueryHandler):
-    def __init__(self, ddb_resource, query_type, event, staging_queue) -> None:
+    def __init__(self, ddb_resource, query_type, event, staging_queue, conn, cur) -> None:
         super().__init__(ddb_resource, query_type, event)
 
         #Load additional tables
@@ -15,7 +15,8 @@ class AghsMatchesHandler(QueryHandler):
         
         self.staging_queue = staging_queue
 
-        #self.output_table = ddb_resource.Table(os.environ['AGHANIM_MATCHES_TABLE'])
+        self.conn = conn
+        self.cur = cur
 
     def get_existing_log(self):
         item = self.query_window_table.get_item(Key={'start_time': self.event['start_time'], 'difficulty': self.event['difficulty']})

@@ -43,7 +43,7 @@ class RDSInitializer(cdk.Construct):
                 ),
             ),
             environment=LAMBDA_ENVS,
-            timeout=core.Duration.minutes(1),
+            timeout=core.Duration.minutes(5),
             profiling=True,
             vpc = props.vpc,
         )

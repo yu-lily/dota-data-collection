@@ -70,7 +70,7 @@ class DotaDataCollectionStack(cdk.Stack):
 
         # Provision RDS instance for final datastore
         vpc = ec2.Vpc(self, "VPC")
-        RDS_SECRET_NAME = "aghs/rds"
+        RDS_SECRET_NAME = "aghs/rds-creds"
         DATABASE_NAME = 'aghs_matches'
         rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='admin', secret_name=RDS_SECRET_NAME)
         rds_creds = rds.Credentials.from_secret(rds_secret)

@@ -87,6 +87,7 @@ class DotaDataCollectionStack(cdk.Stack):
         aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',
             secrets=[aghanim_matches_db.secret],
             vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
         )
         # aghanim_matches_db_proxy = rds.DatabaseProxy(self, 'AghanimMatchesDBProxy',
         #     proxy_target=rds.ProxyTarget.from_instance(aghanim_matches_db),

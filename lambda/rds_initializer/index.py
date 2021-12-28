@@ -32,10 +32,11 @@ def handler(event, context):
     AND table_type='BASE TABLE';""")
 
     tables = cur.fetchall()
-    print(tables)
+    print(f'Existing tables: {tables}')
 
     #Create tables
-    if "matches" not in tables:
+    if ('matches',) not in tables:
+        print("Creating tables")
         cur.execute(open("aghs_schema.sql", "r").read())
         conn.commit()
 

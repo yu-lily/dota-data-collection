@@ -72,7 +72,8 @@ class DotaDataCollectionStack(cdk.Stack):
         vpc = ec2.Vpc(self, "VPC")
         RDS_SECRET_NAME = "aghs/rds"
         DATABASE_NAME = 'aghs_matches'
-        rds_creds = rds.Credentials.from_generated_secret("aghs_rds_credentials", secret_name=RDS_SECRET_NAME)
+        rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='admin', secret_name=RDS_SECRET_NAME)
+        rds_creds = rds.Credentials.from_secret(rds_secret)
 
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
             database_name=DATABASE_NAME,
@@ -107,7 +108,7 @@ class DotaDataCollectionStack(cdk.Stack):
 
         aghanim_matches_db_proxy.grant_connect(rds_initializer.get_function())
         #aghanim_matches_db.connections.allow_default_port_from(rds_initializer.get_function())
-        rds_creds.secret.grant_read(rds_initializer.get_function())
+        rds_secret.grant_read(rds_initializer.get_function())
 
 
         # Lambda Functions

@@ -15,6 +15,7 @@ from dataclasses import dataclass
 @dataclass
 class RDSInitializerProps:
     vpc: ec2.Vpc
+    lambda_security_group: ec2.SecurityGroup
     rds_creds: rds.Credentials
     rds_creds_name: str
     db_endpoint: rds.DatabaseProxy
@@ -46,7 +47,7 @@ class RDSInitializer(cdk.Construct):
             timeout=core.Duration.minutes(5),
             profiling=True,
             vpc = props.vpc,
-            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
+            security_groups=[props.lambda_security_group],
         )
 
         sdk_call = AwsSdkCall(

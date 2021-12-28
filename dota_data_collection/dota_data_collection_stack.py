@@ -75,6 +75,14 @@ class DotaDataCollectionStack(cdk.Stack):
         rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='aghs_rds', secret_name=RDS_SECRET_NAME)
         rds_creds = rds.Credentials.from_secret(rds_secret)
 
+        lambda_to_proxy_group = ec2.SecurityGroup(self, 'Lambda to RDS Proxy Connection', vpc=vpc)
+
+        # We need this security group to allow our proxy to query our MySQL Instance
+        db_connection_group = ec2.SecurityGroup(self, 'Proxy to DB Connection', vpc=vpc)
+        db_connection_group.add_ingress_rule(db_connection_group,ec2.Port.tcp(5432), 'allow db connection')
+        db_connection_group.add_ingress_rule(lambda_to_proxy_group, ec2.Port.tcp(5432), 'allow lambda connection')
+
+
         aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
             database_name=DATABASE_NAME,
             engine=rds.DatabaseInstanceEngine.postgres(version=rds.PostgresEngineVersion.VER_11_5),
@@ -82,12 +90,14 @@ class DotaDataCollectionStack(cdk.Stack):
             credentials=rds_creds,
             vpc=vpc,
             publicly_accessible=True,
+            security_groups=[db_connection_group],
         )
 
         aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',
             secrets=[aghanim_matches_db.secret],
             vpc=vpc,
-            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
+            security_groups=[db_connection_group],
+            #vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
         )
         # aghanim_matches_db_proxy = rds.DatabaseProxy(self, 'AghanimMatchesDBProxy',
         #     proxy_target=rds.ProxyTarget.from_instance(aghanim_matches_db),
@@ -98,9 +108,9 @@ class DotaDataCollectionStack(cdk.Stack):
         print(aghanim_matches_db_proxy.endpoint)
         # Initalize RDS instance with tables
         rds_initializer = RDSInitializer(self, "RDSInitializer",
-            # rds_instance = aghanim_matches_db._physical_name,
             props = RDSInitializerProps(
                 vpc = vpc,
+                lambda_security_group=lambda_to_proxy_group,
                 rds_creds = rds_creds,
                 rds_creds_name = RDS_SECRET_NAME,
                 db_endpoint = aghanim_matches_db_proxy,

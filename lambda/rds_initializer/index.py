@@ -1,4 +1,3 @@
-from attr import s
 import psycopg2
 import os
 import boto3

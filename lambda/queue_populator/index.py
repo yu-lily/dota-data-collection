@@ -55,6 +55,7 @@ def handler(event, context):
             "take": 100, #TODO:CHANGE THESE
             "skip": 0, #TODO:CHANGE THESE
         }
+        
         #TODO: Push to queue instead of calling lambda
         staging_queue.send_message(MessageBody=json.dumps(aghs_payload))
         start_time += WINDOW_SIZE

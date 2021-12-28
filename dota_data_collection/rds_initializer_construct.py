@@ -48,7 +48,6 @@ class RDSInitializer(cdk.Construct):
             profiling=True,
             vpc = props.vpc,
             security_groups=[props.lambda_security_group],
-            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.ISOLATED),
         )
 
         sdk_call = AwsSdkCall(

@@ -26,4 +26,17 @@ def handler(event, context):
         user=secret['username'],
         password=secret['password']
     )
+    cur = conn.cursor()
+
+
+    cur.execute("""SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema='public'
+    AND table_type='BASE TABLE';""")
+
+    for table in cur.fetchall():
+        print(table)
+
+    cur.close()
+    conn.close()
     print("Reached End.")

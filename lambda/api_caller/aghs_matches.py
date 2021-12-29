@@ -47,12 +47,12 @@ class AghsMatchesHandler(QueryHandler):
         if len(self.matches) > 0:
             self.write_to_csv()
 
-            self.cur.copy_from(open('/tmp/matches.csv'), 'matches', sep=',')
-            self.cur.copy_from(open('/tmp/players.csv'), 'players', sep=',')
-            self.cur.copy_from(open('/tmp/player_depthlist.csv'), 'playerDepthList', sep=',')
-            self.cur.copy_from(open('/tmp/player_blessings.csv'), 'playerBlessings', sep=',')
-            self.cur.copy_from(open('/tmp/depthlist.csv'), 'depthList', sep=',')
-            self.cur.copy_from(open('/tmp/ascensionabilities.csv'), 'ascenionAbilities', sep=',')
+            self.cur.copy_from(open('/tmp/matches.csv'), 'matches', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/players.csv'), 'players', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/player_depthlist.csv'), 'playerDepthList', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/player_blessings.csv'), 'playerBlessings', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/depthlist.csv'), 'depthList', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/ascensionabilities.csv'), 'ascenionAbilities', sep=',', null='NULL')
             self.conn.commit()
 
         return self.matches

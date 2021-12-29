@@ -27,7 +27,7 @@ def connect_to_rds():
     db_endpoint = os.environ['AGHANIM_MATCHES_DB_ENDPOINT']
 
     conn = psycopg2.connect(
-        host = os.environ['db_endpoint'],
+        host = db_endpoint,
         database=secret['dbname'],
         user=secret['username'],
         password=secret['password']

@@ -88,14 +88,19 @@ class AghsMatchesHandler(QueryHandler):
         print(f'Queueing next query: {json.dumps(aghs_payload)}')
         self.staging_queue.send_message(MessageBody=json.dumps(aghs_payload))
     
+
+
     def write_to_csv(self):
         #Handle matches
+        def to_csv_wrapper(df, fpath):
+            df.to_csv(fpath, index=False, float_format = '%.0f', header=False, na_rep='NULL')
+
         df = pd.DataFrame(self.matches)
         df = df.drop(['players', 'depthList'], axis=1)
         df['startDateTime'] = pd.to_datetime(df['startDateTime'], unit='s')
         df['endDateTime'] = pd.to_datetime(df['endDateTime'], unit='s')
         #Make bool lowercase if needed
-        df.to_csv('/tmp/matches.csv', index=False, float_format = '%.0f', header=False)
+        to_csv_wrapper(df, '/tmp/matches.csv')
         del df
 
         player_dfs = []
@@ -111,7 +116,7 @@ class AghsMatchesHandler(QueryHandler):
         player_df['neutral0Id'] = player_df['neutral0Id'].replace(['None', 'nan'], np.nan)
         player_df['neutralItemId'] = player_df['neutralItemId'].replace(['None', 'nan'], np.nan)
 
-        player_df.to_csv('/tmp/players.csv', index=False, float_format = '%.0f', header=False)
+        to_csv_wrapper(player_df, '/tmp/players.csv')
         del player_df
 
         player_depthlist_rows = []
@@ -129,7 +134,7 @@ class AghsMatchesHandler(QueryHandler):
                         row['depth'] += 1
 
         player_depthlist_df = pd.concat(player_depthlist_rows, axis=1).T
-        player_depthlist_df.to_csv('/tmp/player_depthlist.csv', index=False, float_format = '%.0f', header=False)
+        to_csv_wrapper(player_depthlist_df, '/tmp/player_depthlist.csv')
         del player_depthlist_df
 
         player_blessings_rows = []
@@ -144,7 +149,7 @@ class AghsMatchesHandler(QueryHandler):
                     player_blessings_rows.append(ser)
 
         player_blessings_df = pd.concat(player_blessings_rows, axis=1).T
-        player_blessings_df.to_csv('/tmp/player_blessings.csv', index=False, float_format = '%.0f', header=False)
+        to_csv_wrapper(player_blessings_df, '/tmp/player_blessings.csv')
         del player_blessings_df
 
         depthlist_rows = []
@@ -160,7 +165,7 @@ class AghsMatchesHandler(QueryHandler):
 
         depthlist_df = pd.concat(depthlist_rows, axis=1).T
         depthlist_df = depthlist_df.drop(['ascensionAbilities'], axis=1)
-        depthlist_df.to_csv('/tmp/depthlist.csv', index=False, float_format = '%.0f', header=False)
+        to_csv_wrapper(depthlist_df, '/tmp/depthlist.csv')
         del depthlist_df
 
         ascensionabilities_rows = []
@@ -177,5 +182,5 @@ class AghsMatchesHandler(QueryHandler):
                     row['depth'] += 1
 
         ascensionabilities_df = pd.concat(ascensionabilities_rows, axis=1).T
-        ascensionabilities_df.to_csv('/tmp/ascensionabilities.csv', index=False, float_format = '%.0f', header=False)
+        to_csv_wrapper(ascensionabilities_df, '/tmp/ascensionabilities.csv')
         del ascensionabilities_df

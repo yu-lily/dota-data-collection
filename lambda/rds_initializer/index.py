@@ -31,6 +31,7 @@ def handler(event, context):
     cur.execute("""DROP TABLE IF EXISTS playerBlessings CASCADE;""")
     cur.execute("""DROP TABLE IF EXISTS depthList CASCADE;""")
     cur.execute("""DROP TABLE IF EXISTS ascenionAbilities CASCADE;""")
+    conn.commit()
 
     #Get all tables
     cur.execute("""SELECT table_name

@@ -228,6 +228,7 @@ class DotaDataCollectionStack(cdk.Stack):
         #Give Stratz API Key access to functions that call the API
         stratz_apikey.grant_read(api_caller_lambda)
         rds_secret.grant_read(api_caller_lambda)
+        rds_secret.grant_read(rds_viewer_lambda)
 
         #QUEUE PERMISSIONS
         #Give the queues access to the functions that call the API
@@ -259,4 +260,4 @@ class DotaDataCollectionStack(cdk.Stack):
         aghanim_query_window_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(queue_populator_lambda)
         aghanim_matches_db_proxy.grant_connect(api_caller_lambda)
-        
+        aghanim_matches_db_proxy.grant_connect(rds_viewer_lambda)

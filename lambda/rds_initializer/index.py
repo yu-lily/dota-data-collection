@@ -24,13 +24,13 @@ def handler(event, context):
     )
     cur = conn.cursor()
 
-    #Destroy existing tables
-    cur.execute("""DROP TABLE IF EXISTS matches CASCADE;""")
-    cur.execute("""DROP TABLE IF EXISTS players CASCADE;""")
-    cur.execute("""DROP TABLE IF EXISTS playerDepthList CASCADE;""")
-    cur.execute("""DROP TABLE IF EXISTS playerBlessings CASCADE;""")
-    cur.execute("""DROP TABLE IF EXISTS depthList CASCADE;""")
-    cur.execute("""DROP TABLE IF EXISTS ascenionAbilities CASCADE;""")
+    # #Destroy existing tables
+    # cur.execute("""DROP TABLE IF EXISTS matches CASCADE;""")
+    # cur.execute("""DROP TABLE IF EXISTS players CASCADE;""")
+    # cur.execute("""DROP TABLE IF EXISTS playerDepthList CASCADE;""")
+    # cur.execute("""DROP TABLE IF EXISTS playerBlessings CASCADE;""")
+    # cur.execute("""DROP TABLE IF EXISTS depthList CASCADE;""")
+    # cur.execute("""DROP TABLE IF EXISTS ascenionAbilities CASCADE;""")
 
     #Get all tables
     cur.execute("""SELECT table_name

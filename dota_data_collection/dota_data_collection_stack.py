@@ -141,7 +141,7 @@ class DotaDataCollectionStack(cdk.Stack):
             ),
             environment=LAMBDA_ENVS,
             timeout=core.Duration.minutes(3),
-            memory_size=512,
+            memory_size=256,
             profiling=True,
             layers=[api_caller_layer],
             vpc=vpc,

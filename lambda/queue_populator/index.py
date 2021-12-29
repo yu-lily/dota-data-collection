@@ -37,7 +37,7 @@ def handler(event, context):
 
     start_time = AGHANIM_RELEASE
     if 'cutoff' in event:
-        cutoff = event['cutoff']
+        cutoff = int(event['cutoff'])
     else:
         cutoff = CURRENT_TIME - 2 * WINDOW_SIZE
 

@@ -144,9 +144,10 @@ class AghsMatchesHandler(QueryHandler):
             for player in match['players']:
                 row['playerSlot'] = player['playerSlot']
                 row['steamAccountId'] = player['steamAccountId']
-                for blessing in player['blessings']:
-                    ser = pd.concat([pd.Series(row), pd.Series(blessing)])
-                    player_blessings_rows.append(ser)
+                if player['blessings']:
+                    for blessing in player['blessings']:
+                        ser = pd.concat([pd.Series(row), pd.Series(blessing)])
+                        player_blessings_rows.append(ser)
 
         player_blessings_df = pd.concat(player_blessings_rows, axis=1).T
         to_csv_wrapper(player_blessings_df, '/tmp/player_blessings.csv')

@@ -1,0 +1,20 @@
+{
+    "Records": [
+      {
+        "messageId": "57592701-187b-4022-b0c6-9f9ce762b4ef",
+        "receiptHandle": "AQEBgjtL+Ab57mqhFiRFeSRvJMgqvAHAA5KAMYaDqCPYYJe1oxuYu/Jisp4InwBJYLVS9ZIzxgzWIv+zrPVgelTNaBo0npXMohG/53fK2iaBzhXijzF+h4CG7x17YkWK1gAvP0VUlI7IOREYxKNio/lhhUdk96URFacPiMIpezRvWLvbFQ8cW2BsfOw5iHyHV0dv0GdAZlwlNlZg7xzwAu6bXYrEcRVTjuEpRRFhEBIPrlhDCKonjpvZ1UeFXUtxnDny+NRkP1eD6nBA6GEeATQ+OtDSxFirgEkDlI3kr/X0pDl0//Ye5MUzQ1kkL1fu/fhfc9CDpAs3DeXk+aK2qqUjETD8NrC0Y2n2HGPm/5aGSKpNtAFZ1feS7ApQbKUR0G/CsjryshWmrBsdFqBoCE096l+eXMCMAGfcCSbTIk0ra8Q9zK1hN3xZDFifdP+2ACgMCNRMoMp7p5/qMZ/85dMBUg==",
+        "body": "{\"query_type\": \"aghs_matches\", \"window\": 1800, \"start_time\": 1639745460, \"difficulty\": \"APEXMAGE\", \"take\": 100, \"skip\": 0}",
+        "attributes": {
+          "ApproximateReceiveCount": "10",
+          "SentTimestamp": "1640493084743",
+          "SenderId": "AROAY72KBA72QSLGLASBB:DotaDataCollectionStack-OrchestratorLambdaA7A0AD32-9gjch8XECuFH",
+          "ApproximateFirstReceiveTimestamp": "1640493084743"
+        },
+        "messageAttributes": {},
+        "md5OfBody": "f9d8529255d03f297553fabda95050ca",
+        "eventSource": "aws:sqs",
+        "eventSourceARN": "arn:aws:sqs:us-west-2:618093676533:DotaDataCollectionStack-APICallerQueueF52A66E5-1KTR07GV6ELNC",
+        "awsRegion": "us-west-2"
+      }
+    ]
+  }

@@ -30,12 +30,18 @@ def handler(event, context):
     #Call find_matchids lambda in a throttled fashion, working through the queue
 
     AGHANIM_RELEASE = 1639533060
+
     CURRENT_TIME = int(time.time())
     WINDOW_SIZE = 1800
     DIFFICULTY = event['difficulty']
 
     start_time = AGHANIM_RELEASE
-    while start_time < CURRENT_TIME - 2 * WINDOW_SIZE:
+    if 'cutoff' in event:
+        cutoff = event['cutoff']
+    else:
+        cutoff = CURRENT_TIME - 2 * WINDOW_SIZE
+
+    while start_time < cutoff:
         #Check if window has been handled
         item = query_window_table.get_item(Key={'start_time': start_time, 'difficulty': DIFFICULTY})
         if 'Item' in item:

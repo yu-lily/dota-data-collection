@@ -11,8 +11,6 @@ def connect_to_rds():
     rds_creds = json.loads(rds_creds)
     db_endpoint = os.environ['AGHANIM_MATCHES_DB_ENDPOINT']
 
-    print(secret)
-
     conn = psycopg2.connect(
         host = db_endpoint,
         database=rds_creds['dbname'],

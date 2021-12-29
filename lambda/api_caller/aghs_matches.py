@@ -44,15 +44,16 @@ class AghsMatchesHandler(QueryHandler):
             self.reached_end = True
         print(f'Found {len(self.matches)} matches')
 
-        self.write_to_csv()
+        if len(self.matches) > 0:
+            self.write_to_csv()
 
-        self.cur.copy_from('/tmp/matches.csv', 'matches')
-        self.cur.copy_from('/tmp/players.csv', 'players')
-        self.cur.copy_from('/tmp/player_depthlist.csv', 'playerDepthList')
-        self.cur.copy_from('/tmp/player_blessings.csv', 'playerBlessings')
-        self.cur.copy_from('/tmp/depthlist.csv', 'depthList')
-        self.cur.copy_from('/tmp/ascensionabilities.csv', 'ascenionAbilities')
-        self.conn.commit()
+            self.cur.copy_from(open('/tmp/matches.csv', 'matches'))
+            self.cur.copy_from(open('/tmp/players.csv', 'players'))
+            self.cur.copy_from(open('/tmp/player_depthlist.csv', 'playerDepthList'))
+            self.cur.copy_from(open('/tmp/player_blessings.csv', 'playerBlessings'))
+            self.cur.copy_from(open('/tmp/depthlist.csv', 'depthList'))
+            self.cur.copy_from(open('/tmp/ascensionabilities.csv', 'ascenionAbilities'))
+            self.conn.commit()
 
         return self.matches
 

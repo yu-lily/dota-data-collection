@@ -147,6 +147,28 @@ class DotaDataCollectionStack(cdk.Stack):
             security_groups=[lambda_to_proxy_group],
         )
 
+        rds_viewer_lambda = _lambda.Function(
+            self, "RDSViewer",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(
+                "lambda/rds_viewer",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment=LAMBDA_ENVS,
+            timeout=core.Duration.minutes(3),
+            profiling=True,
+            layers=[api_caller_layer],
+            vpc=vpc,
+            security_groups=[lambda_to_proxy_group],
+        )
+
         LAMBDA_FUNC_NAMES = {
             "API_CALLER_FUNC_NAME": api_caller_lambda.function_name,
         }

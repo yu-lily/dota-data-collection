@@ -33,8 +33,8 @@ def connect_to_rds():
     #     password=secret['password']
     # )
     #cur = conn.cursor()
-
-    return None, None
+    conn, cur = None, None
+    return conn, cur
 
 
 def handler(event, context):

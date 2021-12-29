@@ -2,14 +2,6 @@ import json
 import boto3
 import os
 import psycopg2
-
-#Create clients for interfacing with AWS resources
-ddb_resource = boto3.resource('dynamodb')
-
-sqs = boto3.resource('sqs')
-staging_queue = sqs.get_queue_by_name(QueueName=os.environ["STAGING_QUEUE"])
-
-
 session = boto3.session.Session()
 
 def connect_to_rds():

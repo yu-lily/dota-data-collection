@@ -43,10 +43,10 @@ class AghsMatchesHandler(QueryHandler):
         print(f'Found {len(self.matches)} matches')
 
 
-        with self.output_table.batch_writer() as batch:
-            for match in self.matches:
-                print(f'Writing item: {match}')
-                #batch.put_item(Item=match)
+        #with self.output_table.batch_writer() as batch:
+        for match in self.matches:
+            print(f'Writing item: {match}')
+            #batch.put_item(Item=match)
         return self.matches
 
     def get_errors(self):

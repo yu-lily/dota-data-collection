@@ -1,7 +1,7 @@
 import json
 import boto3
 import os
-import psycopg2
+#import psycopg2
 
 from api_caller.lib import APICaller, API_Call_Metadata
 
@@ -21,10 +21,10 @@ def choose_handler(query_type):
 
 def connect_to_rds():
     sm_client = session.client(service_name='secretsmanager', region_name='us-west-2')
-    secret = sm_client.get_secret_value(SecretId=os.environ['rds_creds_name'])
+    secret = sm_client.get_secret_value(SecretId=os.environ['RDS_CREDS_NAME'])
     rds_creds = secret['SecretString']
     rds_creds = json.loads(rds_creds)
-    db_endpoint = os.environ['db_endpoint']
+    db_endpoint = os.environ['AGHANIM_MATCHES_DB_ENDPOINT']
 
     # conn = psycopg2.connect(
     #     host = os.environ['db_endpoint'],

@@ -1,7 +1,7 @@
 import json
 import boto3
 import os
-#import psycopg2
+import psycopg2
 
 from api_caller.lib import APICaller, API_Call_Metadata
 
@@ -26,14 +26,13 @@ def connect_to_rds():
     rds_creds = json.loads(rds_creds)
     db_endpoint = os.environ['AGHANIM_MATCHES_DB_ENDPOINT']
 
-    # conn = psycopg2.connect(
-    #     host = os.environ['db_endpoint'],
-    #     database=secret['dbname'],
-    #     user=secret['username'],
-    #     password=secret['password']
-    # )
-    #cur = conn.cursor()
-    conn, cur = None, None
+    conn = psycopg2.connect(
+        host = os.environ['db_endpoint'],
+        database=secret['dbname'],
+        user=secret['username'],
+        password=secret['password']
+    )
+    cur = conn.cursor()
     return conn, cur
 
 
@@ -60,3 +59,7 @@ def handler(event, context):
 
     
     errors += handler.get_errors()
+
+    cur.close()
+    conn.close()
+    print("Reached end.")

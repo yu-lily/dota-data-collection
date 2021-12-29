@@ -46,10 +46,14 @@ class AghsMatchesHandler(QueryHandler):
 
         self.write_to_csv()
 
-        #with self.output_table.batch_writer() as batch:
-        for match in self.matches:
-            print(f'Writing item: {match}')
-            #batch.put_item(Item=match)
+        self.cur.copy_from('/tmp/matches.csv', 'matches')
+        self.cur.copy_from('/tmp/players.csv', 'players')
+        self.cur.copy_from('/tmp/player_depthlist.csv', 'playerDepthList')
+        self.cur.copy_from('/tmp/player_blessings.csv', 'playerBlessings')
+        self.cur.copy_from('/tmp/depthlist.csv', 'depthList')
+        self.cur.copy_from('/tmp/ascensionabilities.csv', 'ascenionAbilities')
+        self.conn.commit()
+
         return self.matches
 
     def get_errors(self):

@@ -28,9 +28,9 @@ def connect_to_rds():
 
     conn = psycopg2.connect(
         host = db_endpoint,
-        database=secret['dbname'],
-        user=secret['username'],
-        password=secret['password']
+        database=rds_creds['dbname'],
+        user=rds_creds['username'],
+        password=rds_creds['password']
     )
     cur = conn.cursor()
     return conn, cur

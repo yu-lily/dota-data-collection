@@ -25,6 +25,7 @@ def handler(event, context):
     cur = conn.cursor()
 
     # #Destroy existing tables
+    print("Dropping tables")
     cur.execute("""DROP TABLE IF EXISTS matches CASCADE;""")
     cur.execute("""DROP TABLE IF EXISTS players CASCADE;""")
     cur.execute("""DROP TABLE IF EXISTS playerDepthList CASCADE;""")

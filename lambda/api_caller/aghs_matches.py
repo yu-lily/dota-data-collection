@@ -3,6 +3,7 @@ import json
 from query_handler import QueryHandler
 from api_caller.lib import APICaller, API_Call_Metadata
 import pandas as pd
+import numpy as np
 
 class AghsMatchesHandler(QueryHandler):
     def __init__(self, ddb_resource, query_type, event, staging_queue, conn, cur) -> None:
@@ -90,6 +91,7 @@ class AghsMatchesHandler(QueryHandler):
         df['endDateTime'] = pd.to_datetime(df['endDateTime'], unit='s')
         #Make bool lowercase if needed
         df.to_csv('/tmp/matches.csv', index=False)
+        del df
 
         player_dfs = []
         for match in self.matches:
@@ -105,6 +107,7 @@ class AghsMatchesHandler(QueryHandler):
         player_df['neutralItemId'] = player_df['neutralItemId'].replace(['None', 'nan'], np.nan)
 
         player_df.to_csv('/tmp/players.csv', index=False, float_format = '%.0f')
+        del player_df
 
         player_depthlist_rows = []
         for match in self.matches:
@@ -122,6 +125,7 @@ class AghsMatchesHandler(QueryHandler):
 
         player_depthlist_df = pd.concat(player_depthlist_rows, axis=1).T
         player_depthlist_df.to_csv('/tmp/player_depthlist.csv', index=False, float_format = '%.0f')
+        del player_depthlist_df
 
         player_blessings_rows = []
         for match in self.matches:
@@ -136,6 +140,7 @@ class AghsMatchesHandler(QueryHandler):
 
         player_blessings_df = pd.concat(player_blessings_rows, axis=1).T
         player_blessings_df.to_csv('/tmp/player_blessings.csv', index=False, float_format = '%.0f')
+        del player_blessings_df
 
         depthlist_rows = []
         for match in self.matches:
@@ -151,6 +156,7 @@ class AghsMatchesHandler(QueryHandler):
         depthlist_df = pd.concat(depthlist_rows, axis=1).T
         depthlist_df = depthlist_df.drop(['ascensionAbilities'], axis=1)
         depthlist_df.to_csv('/tmp/depthlist.csv', index=False, float_format = '%.0f')
+        del depthlist_df
 
         ascensionabilities_rows = []
         for match in self.matches:
@@ -167,3 +173,4 @@ class AghsMatchesHandler(QueryHandler):
 
         ascensionabilities_df = pd.concat(ascensionabilities_rows, axis=1).T
         ascensionabilities_df.to_csv('/tmp/ascensionabilities.csv', index=False, float_format = '%.0f')
+        del ascensionabilities_df

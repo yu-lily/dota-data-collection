@@ -49,10 +49,10 @@ class AghsMatchesHandler(QueryHandler):
 
             self.cur.copy_from(open('/tmp/matches.csv'), 'matches', sep=',', null='NULL')
             self.cur.copy_from(open('/tmp/players.csv'), 'players', sep=',', null='NULL')
-            self.cur.copy_from(open('/tmp/player_depthlist.csv'), 'playerDepthList', sep=',', null='NULL')
-            self.cur.copy_from(open('/tmp/player_blessings.csv'), 'playerBlessings', sep=',', null='NULL')
-            self.cur.copy_from(open('/tmp/depthlist.csv'), 'depthList', sep=',', null='NULL')
-            self.cur.copy_from(open('/tmp/ascensionabilities.csv'), 'ascenionAbilities', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/player_depthlist.csv'), 'playerdepthlist', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/player_blessings.csv'), 'playerblessings', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/depthlist.csv'), 'depthlist', sep=',', null='NULL')
+            self.cur.copy_from(open('/tmp/ascensionabilities.csv'), 'ascenionabilities', sep=',', null='NULL')
             self.conn.commit()
 
         return self.matches

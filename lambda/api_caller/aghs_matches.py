@@ -2,6 +2,7 @@ import os
 import json
 from query_handler import QueryHandler
 from api_caller.lib import APICaller, API_Call_Metadata
+import pandas as pd
 
 class AghsMatchesHandler(QueryHandler):
     def __init__(self, ddb_resource, query_type, event, staging_queue, conn, cur) -> None:
@@ -42,6 +43,7 @@ class AghsMatchesHandler(QueryHandler):
             self.reached_end = True
         print(f'Found {len(self.matches)} matches')
 
+        self.write_to_csv()
 
         #with self.output_table.batch_writer() as batch:
         for match in self.matches:
@@ -79,3 +81,89 @@ class AghsMatchesHandler(QueryHandler):
 
         print(f'Queueing next query: {json.dumps(aghs_payload)}')
         self.staging_queue.send_message(MessageBody=json.dumps(aghs_payload))
+    
+    def write_to_csv(self):
+        #Handle matches
+        df = pd.DataFrame(self.matches)
+        df = df.drop(['players', 'depthList'], axis=1)
+        df['startDateTime'] = pd.to_datetime(df['startDateTime'], unit='s')
+        df['endDateTime'] = pd.to_datetime(df['endDateTime'], unit='s')
+        #Make bool lowercase if needed
+        df.to_csv('/tmp/matches.csv', index=False)
+
+        player_dfs = []
+        for match in self.matches:
+            player_dfs.append(pd.DataFrame(match['players']))
+        player_df = pd.concat(player_dfs) 
+        player_df = player_df.drop(['depthList', 'blessings'], axis=1)
+
+        for i in range(6):
+            col = f'item{i}Id'
+            player_df[col] = player_df[col].replace(['None', 'nan'], np.nan)
+            
+        player_df['neutral0Id'] = player_df['neutral0Id'].replace(['None', 'nan'], np.nan)
+        player_df['neutralItemId'] = player_df['neutralItemId'].replace(['None', 'nan'], np.nan)
+
+        player_df.to_csv('/tmp/players.csv', index=False, float_format = '%.0f')
+
+        player_depthlist_rows = []
+        for match in self.matches:
+            row = {}
+            row['matchId'] = match['id']
+            for player in match['players']:
+                row['playerSlot'] = player['playerSlot']
+                row['depth'] = 0
+                row['steamAccountId'] = player['steamAccountId']
+                if player['depthList']:
+                    for depth_item in player['depthList']:
+                        ser = pd.concat([pd.Series(row), pd.Series(depth_item)])
+                        player_depthlist_rows.append(ser)
+                        row['depth'] += 1
+
+        player_depthlist_df = pd.concat(player_depthlist_rows, axis=1).T
+        player_depthlist_df.to_csv('/tmp/player_depthlist.csv', index=False, float_format = '%.0f')
+
+        player_blessings_rows = []
+        for match in self.matches:
+            row = {}
+            row['matchId'] = match['id']
+            for player in match['players']:
+                row['playerSlot'] = player['playerSlot']
+                row['steamAccountId'] = player['steamAccountId']
+                for blessing in player['blessings']:
+                    ser = pd.concat([pd.Series(row), pd.Series(blessing)])
+                    player_blessings_rows.append(ser)
+
+        player_blessings_df = pd.concat(player_blessings_rows, axis=1).T
+        player_blessings_df.to_csv('/tmp/player_blessings.csv', index=False, float_format = '%.0f')
+
+        depthlist_rows = []
+        for match in self.matches:
+            row = {}
+            row['matchId'] = match['id']
+            row['depth'] = 0
+            if match['depthList']:
+                for depth in match['depthList']:
+                    ser = pd.concat([pd.Series(row), pd.Series(depth)])
+                    depthlist_rows.append(ser)
+                    row['depth'] += 1
+
+        depthlist_df = pd.concat(depthlist_rows, axis=1).T
+        depthlist_df = depthlist_df.drop(['ascensionAbilities'], axis=1)
+        depthlist_df.to_csv('/tmp/depthlist.csv', index=False, float_format = '%.0f')
+
+        ascensionabilities_rows = []
+        for match in self.matches:
+            row = {}
+            row['matchId'] = match['id']
+            row['depth'] = 0
+            if match['depthList']:
+                for depth in match['depthList']:
+                    if depth['ascensionAbilities']:
+                        for ascensionability in depth['ascensionAbilities']:
+                            ser = pd.concat([pd.Series(row), pd.Series(ascensionability)])
+                            ascensionabilities_rows.append(ser)
+                    row['depth'] += 1
+
+        ascensionabilities_df = pd.concat(ascensionabilities_rows, axis=1).T
+        ascensionabilities_df.to_csv('/tmp/ascensionabilities.csv', index=False, float_format = '%.0f')

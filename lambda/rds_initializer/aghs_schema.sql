@@ -63,9 +63,9 @@ CREATE TABLE playerDepthList(
     networth INTEGER,
     rarity SMALLINT,
     selectedRewardAbilityId INTEGER,
-    selectedRewardImageAbilityId INTEGER,
     unSelectedRewardAbilityId1 INTEGER,
     unSelectedRewardAbilityId2 INTEGER,
+    selectedRewardImageAbilityId INTEGER,
     PRIMARY KEY(matchId, playerSlot, depth),
     FOREIGN KEY(matchId) REFERENCES matches(id),
     FOREIGN KEY(matchId, playerSlot) REFERENCES players(matchId, playerSlot)

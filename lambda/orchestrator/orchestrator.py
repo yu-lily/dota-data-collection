@@ -13,11 +13,11 @@ api_caller_queue = sqs.get_queue_by_name(QueueName=os.environ["API_CALLER_QUEUE"
 def handler(event, context):
     print('request: {}'.format(json.dumps(event)))
 
-    BATCH_SIZE = 10
+    BATCH_SIZE = 5
     CYCLE_LIMIT = 20
     INVOCATION_INTERVAL = 2 #seconds
     # STRATZ api limit is 250 per minute, this function is called by the minute
-    # 20 batches of size 10 calls each = 200 calls/min (Staying safe amount under limit)
+    # 20 batches of size 5 calls each = 100 calls/min (Staying safe amount under limit)
 
     last_cycle_time = 0
 

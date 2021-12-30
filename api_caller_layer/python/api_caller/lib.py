@@ -66,6 +66,7 @@ class APICaller:
         else:
             print(f"Query failed with status code: {r.status_code}")
             print(f"Response: {r.text}")
+            raise Exception(f"Query failed with status code: {r.status_code}")
             return {'errors': [{'message': r.text}]}
 
     # def query(self, query: str, variables: dict, metadata:API_Call_Metadata) -> dict:

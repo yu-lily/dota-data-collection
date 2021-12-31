@@ -13,8 +13,6 @@ from aws_cdk import (
     core
 )
 
-from .rds_initializer_construct import RDSInitializer, RDSInitializerProps
-
 from aws_cdk.aws_lambda_event_sources import SqsEventSource
 
 class DotaDataCollectionStack(cdk.Stack):
@@ -35,76 +33,57 @@ class DotaDataCollectionStack(cdk.Stack):
         failure_queue = sqs.Queue(self, 'FailureQueue',
             visibility_timeout=core.Duration.seconds(300),
         )
+
         # DynamoDB tables
-        players_table = ddb.Table(
-            self, "PlayersTable",
+        def create_ddb(table_name: str, partition_key: ddb.Attribute, sort_key: ddb.Attribute = None) -> ddb.Table:
+            return ddb.Table(
+                self, table_name,
+                partition_key=partition_key,
+                sort_key=sort_key,
+                billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
+                removal_policy=core.RemovalPolicy.DESTROY
+            )
+
+        # Helper data structures
+        players_table = create_ddb("PlayersTable",
             partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
-            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=core.RemovalPolicy.DESTROY
         )
-        matchid_table = ddb.Table(
-            self, "MatchIDTable",
+        matchid_table = create_ddb("MatchIDTable",
             partition_key=ddb.Attribute(name="match_id", type=ddb.AttributeType.NUMBER),
-            removal_policy=core.RemovalPolicy.DESTROY
         )
-        api_calls_table = ddb.Table(
-            self, "APICallsTable",
+        api_calls_table = create_ddb("APICallsTable",
             partition_key=ddb.Attribute(name="api_call_id", type=ddb.AttributeType.NUMBER),
-            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=core.RemovalPolicy.DESTROY
-        )
-        aghanim_query_window_table = ddb.Table(
-            self, "AghanimQueryWindowTable",
+        )        
+        aghanim_query_window_table = create_ddb("AghanimQueryWindowTable",
             partition_key=ddb.Attribute(name="start_time", type=ddb.AttributeType.NUMBER),
             sort_key=ddb.Attribute(name="difficulty", type=ddb.AttributeType.STRING),
-            billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=core.RemovalPolicy.DESTROY,
-        )
-        
-
-        # Provision RDS instance for final datastore
-        vpc = ec2.Vpc(self, "VPC")
-        RDS_SECRET_NAME = "aghs/rds-creds"
-        DATABASE_NAME = 'aghs_matches'
-        rds_secret = rds.DatabaseSecret(self, "AghsRdsSecret", username='aghs_rds', secret_name=RDS_SECRET_NAME)
-        rds_creds = rds.Credentials.from_secret(rds_secret)
-
-        lambda_to_proxy_group = ec2.SecurityGroup(self, 'Lambda to RDS Proxy Connection', vpc=vpc)
-
-        # We need this security group to allow our proxy to query our MySQL Instance
-        db_connection_group = ec2.SecurityGroup(self, 'Proxy to DB Connection', vpc=vpc)
-        db_connection_group.add_ingress_rule(db_connection_group,ec2.Port.tcp(5432), 'allow db connection')
-        db_connection_group.add_ingress_rule(lambda_to_proxy_group, ec2.Port.tcp(5432), 'allow lambda connection')
-
-        aghanim_matches_db = rds.DatabaseInstance(self, 'AghanimMatchesDB',
-            database_name=DATABASE_NAME,
-            engine=rds.DatabaseInstanceEngine.postgres(version=rds.PostgresEngineVersion.VER_11_12),
-            instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
-            credentials=rds_creds,
-            vpc=vpc,
-            security_groups=[db_connection_group],
         )
 
-        aghanim_matches_db_proxy = aghanim_matches_db.add_proxy('AghanimMatchesDBProxy',
-            secrets=[aghanim_matches_db.secret],
-            vpc=vpc,
-            security_groups=[db_connection_group],
+        # Results tables
+        aghanim_matches_table = create_ddb("AghanimMatchesTable",
+            partition_key=ddb.Attribute(name="id", type=ddb.AttributeType.NUMBER),
         )
-
-        # Initalize RDS instance with tables
-        rds_initializer = RDSInitializer(self, "RDSInitializer",
-            props = RDSInitializerProps(
-                vpc = vpc,
-                lambda_security_group=lambda_to_proxy_group,
-                rds_creds = rds_creds,
-                rds_creds_name = RDS_SECRET_NAME,
-                db_endpoint = aghanim_matches_db_proxy,
-            )
+        aghanim_players_table = create_ddb("AghanimPlayersTable",
+            partition_key=ddb.Attribute(name="matchId", type=ddb.AttributeType.NUMBER),
+            sort_key=ddb.Attribute(name="playerSlot", type=ddb.AttributeType.NUMBER),
         )
-
-        aghanim_matches_db_proxy.grant_connect(rds_initializer.get_function())
-        rds_secret.grant_read(rds_initializer.get_function())
-
+        aghanim_player_depthlist_table = create_ddb("AghanimPlayerDepthListTable",
+            partition_key=ddb.Attribute(name="matchId-playerSlot", type=ddb.AttributeType.NUMBER),
+            sort_key=ddb.Attribute(name="depth", type=ddb.AttributeType.NUMBER),
+        )
+        aghanim_player_blessings_table = create_ddb("AghanimPlayerBlessingsTable",
+            partition_key=ddb.Attribute(name="matchId-playerSlot", type=ddb.AttributeType.NUMBER),
+            sort_key=ddb.Attribute(name="type", type=ddb.AttributeType.STRING),
+        )
+        aghanim_depthlist_table = create_ddb("AghanimDepthListTable",
+            partition_key=ddb.Attribute(name="matchId", type=ddb.AttributeType.NUMBER),
+            sort_key=ddb.Attribute(name="depth", type=ddb.AttributeType.NUMBER),
+        )
+        aghanim_ascensionabilities_table = create_ddb("AghanimAscensionAbilitiesTable",
+            partition_key=ddb.Attribute(name="matchId-depth", type=ddb.AttributeType.NUMBER),
+            sort_key=ddb.Attribute(name="type", type=ddb.AttributeType.STRING),
+        )
+    
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(
             self, "APICallerLayer",
@@ -124,9 +103,13 @@ class DotaDataCollectionStack(cdk.Stack):
             "STAGING_QUEUE": staging_queue.queue_name,
             "API_CALLER_QUEUE": api_caller_queue.queue_name,
             "FAILURE_QUEUE": failure_queue.queue_name,
-            
-            "RDS_CREDS_NAME": RDS_SECRET_NAME,
-            "AGHANIM_MATCHES_DB_ENDPOINT": aghanim_matches_db_proxy.endpoint,
+
+            "AGHANIM_MATCHES_TABLE": aghanim_matches_table.table_name,
+            "AGHANIM_PLAYERS_TABLE": aghanim_players_table.table_name,
+            "AGHANIM_PLAYER_DEPTHLIST_TABLE": aghanim_player_depthlist_table.table_name,
+            "AGHANIM_PLAYER_BLESSINGS_TABLE": aghanim_player_blessings_table.table_name,
+            "AGHANIM_DEPTHLIST_TABLE": aghanim_depthlist_table.table_name,
+            "AGHANIM_ASCENSIONABILITIES_TABLE": aghanim_ascensionabilities_table.table_name,
         }
 
         api_caller_lambda = _lambda.Function(
@@ -148,30 +131,6 @@ class DotaDataCollectionStack(cdk.Stack):
             memory_size=256,
             profiling=True,
             layers=[api_caller_layer],
-            vpc=vpc,
-            security_groups=[lambda_to_proxy_group],
-        )
-
-        rds_viewer_lambda = _lambda.Function(
-            self, "RDSViewer",
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            handler="index.handler",
-            code=_lambda.Code.from_asset(
-                "lambda/rds_viewer",
-                bundling=core.BundlingOptions(
-                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
-                    command=[
-                        "bash", "-c",
-                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
-                    ],
-                ),
-            ),
-            environment=LAMBDA_ENVS,
-            timeout=core.Duration.minutes(3),
-            profiling=True,
-            layers=[api_caller_layer],
-            vpc=vpc,
-            security_groups=[lambda_to_proxy_group],
         )
 
         LAMBDA_FUNC_NAMES = {
@@ -250,8 +209,6 @@ class DotaDataCollectionStack(cdk.Stack):
         #STRATZ API KEY ACCESS
         #Give Stratz API Key access to functions that call the API
         stratz_apikey.grant_read(api_caller_lambda)
-        rds_secret.grant_read(api_caller_lambda)
-        rds_secret.grant_read(rds_viewer_lambda)
 
         #QUEUE PERMISSIONS
         #Give the queues access to the functions that call the API
@@ -285,5 +242,11 @@ class DotaDataCollectionStack(cdk.Stack):
         aghanim_query_window_table.grant_read_data(orchestrator_lambda)
         aghanim_query_window_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(queue_populator_lambda)
-        aghanim_matches_db_proxy.grant_connect(api_caller_lambda)
-        aghanim_matches_db_proxy.grant_connect(rds_viewer_lambda)
+        
+        #Results tables
+        aghanim_matches_table.grant_read_write_data(api_caller_lambda)
+        aghanim_players_table.grant_read_write_data(api_caller_lambda)
+        aghanim_player_depthlist_table.grant_read_write_data(api_caller_lambda)
+        aghanim_player_blessings_table.grant_read_write_data(api_caller_lambda)
+        aghanim_depthlist_table.grant_read_write_data(api_caller_lambda)
+        aghanim_ascensionabilities_table.grant_read_write_data(api_caller_lambda)

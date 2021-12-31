@@ -2,8 +2,7 @@ import os
 import json
 from query_handler import QueryHandler
 from api_caller.lib import APICaller, API_Call_Metadata
-import pandas as pd
-import numpy as np
+
 
 class AghsMatchesHandler(QueryHandler):
     def __init__(self, ddb_resource, query_type, event, sqs_resource) -> None:

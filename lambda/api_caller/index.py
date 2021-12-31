@@ -10,7 +10,7 @@ ddb_resource = boto3.resource('dynamodb')
 
 sqs = boto3.resource('sqs')
 staging_queue = sqs.get_queue_by_name(QueueName=os.environ["STAGING_QUEUE"])
-failure_queue = sqs_resource.get_queue_by_name(QueueName=os.environ["FAILURE_QUEUE"])
+failure_queue = sqs.get_queue_by_name(QueueName=os.environ["FAILURE_QUEUE"])
 
 session = boto3.session.Session()
 

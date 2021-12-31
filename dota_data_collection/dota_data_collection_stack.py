@@ -22,10 +22,10 @@ class DotaDataCollectionStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Handle Stratz API Key
+        # Stratz API Key
         stratz_apikey = sm.Secret.from_secret_name_v2(self, "StratzAPIKey", secret_name="stratz/apikey")
 
-        # Create SQS Queue
+        # SQS Queues
         staging_queue = sqs.Queue(self, 'StagingQueue',
             visibility_timeout=core.Duration.seconds(300),
         )
@@ -35,7 +35,7 @@ class DotaDataCollectionStack(cdk.Stack):
         failure_queue = sqs.Queue(self, 'FailureQueue',
             visibility_timeout=core.Duration.seconds(300),
         )
-        # Create a DynamoDB table
+        # DynamoDB tables
         players_table = ddb.Table(
             self, "PlayersTable",
             partition_key=ddb.Attribute(name="player_id", type=ddb.AttributeType.NUMBER),
@@ -60,6 +60,7 @@ class DotaDataCollectionStack(cdk.Stack):
             billing_mode=ddb.BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY,
         )
+        
 
         # Provision RDS instance for final datastore
         vpc = ec2.Vpc(self, "VPC")

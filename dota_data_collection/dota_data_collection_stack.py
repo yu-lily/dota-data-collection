@@ -63,26 +63,6 @@ class DotaDataCollectionStack(cdk.Stack):
         aghanim_matches_table = create_ddb("AghanimMatchesTable",
             partition_key=ddb.Attribute(name="id", type=ddb.AttributeType.NUMBER),
         )
-        aghanim_players_table = create_ddb("AghanimPlayersTable",
-            partition_key=ddb.Attribute(name="matchId", type=ddb.AttributeType.NUMBER),
-            sort_key=ddb.Attribute(name="playerSlot", type=ddb.AttributeType.NUMBER),
-        )
-        aghanim_player_depthlist_table = create_ddb("AghanimPlayerDepthListTable",
-            partition_key=ddb.Attribute(name="matchId-playerSlot", type=ddb.AttributeType.NUMBER),
-            sort_key=ddb.Attribute(name="depth", type=ddb.AttributeType.NUMBER),
-        )
-        aghanim_player_blessings_table = create_ddb("AghanimPlayerBlessingsTable",
-            partition_key=ddb.Attribute(name="matchId-playerSlot", type=ddb.AttributeType.NUMBER),
-            sort_key=ddb.Attribute(name="type", type=ddb.AttributeType.STRING),
-        )
-        aghanim_depthlist_table = create_ddb("AghanimDepthListTable",
-            partition_key=ddb.Attribute(name="matchId", type=ddb.AttributeType.NUMBER),
-            sort_key=ddb.Attribute(name="depth", type=ddb.AttributeType.NUMBER),
-        )
-        aghanim_ascensionabilities_table = create_ddb("AghanimAscensionAbilitiesTable",
-            partition_key=ddb.Attribute(name="matchId-depth", type=ddb.AttributeType.NUMBER),
-            sort_key=ddb.Attribute(name="type", type=ddb.AttributeType.STRING),
-        )
     
         # Lambda Functions
         api_caller_layer = _lambda.LayerVersion(
@@ -105,11 +85,6 @@ class DotaDataCollectionStack(cdk.Stack):
             "FAILURE_QUEUE": failure_queue.queue_name,
 
             "AGHANIM_MATCHES_TABLE": aghanim_matches_table.table_name,
-            "AGHANIM_PLAYERS_TABLE": aghanim_players_table.table_name,
-            "AGHANIM_PLAYER_DEPTHLIST_TABLE": aghanim_player_depthlist_table.table_name,
-            "AGHANIM_PLAYER_BLESSINGS_TABLE": aghanim_player_blessings_table.table_name,
-            "AGHANIM_DEPTHLIST_TABLE": aghanim_depthlist_table.table_name,
-            "AGHANIM_ASCENSIONABILITIES_TABLE": aghanim_ascensionabilities_table.table_name,
         }
 
         api_caller_lambda = _lambda.Function(
@@ -244,8 +219,3 @@ class DotaDataCollectionStack(cdk.Stack):
         
         #Results tables
         aghanim_matches_table.grant_read_write_data(api_caller_lambda)
-        aghanim_players_table.grant_read_write_data(api_caller_lambda)
-        aghanim_player_depthlist_table.grant_read_write_data(api_caller_lambda)
-        aghanim_player_blessings_table.grant_read_write_data(api_caller_lambda)
-        aghanim_depthlist_table.grant_read_write_data(api_caller_lambda)
-        aghanim_ascensionabilities_table.grant_read_write_data(api_caller_lambda)

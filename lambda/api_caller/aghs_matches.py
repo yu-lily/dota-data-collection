@@ -17,11 +17,6 @@ class AghsMatchesHandler(QueryHandler):
         self.staging_queue = sqs_resource.get_queue_by_name(QueueName=os.environ["STAGING_QUEUE"])
 
         self.aghanim_matches = ddb_resource.Table(os.environ['AGHANIM_MATCHES_TABLE'])
-        self.aghanim_players = ddb_resource.Table(os.environ['AGHANIM_PLAYERS_TABLE'])
-        self.aghanim_player_depthlist = ddb_resource.Table(os.environ['AGHANIM_PLAYER_DEPTHLIST_TABLE'])
-        self.aghanim_player_blessings = ddb_resource.Table(os.environ['AGHANIM_PLAYER_BLESSINGS_TABLE'])
-        self.aghanim_depthlist = ddb_resource.Table(os.environ['AGHANIM_DEPTHLIST_TABLE'])
-        self.aghanim_ascensionabilities = ddb_resource.Table(os.environ['AGHANIM_ASCENSIONABILITIES_TABLE'])
 
 
     def get_existing_log(self):
@@ -48,67 +43,10 @@ class AghsMatchesHandler(QueryHandler):
             self.reached_end = True
         print(f'Found {len(self.matches)} matches')
 
-        match_items = []
-        player_items = []
-        player_depthlist_items = []
-        player_blessings_items = []
-        depthlist_items = []
-        ascensionabilities_items = []
-
-        #Unpack match data
-        for match in self.matches:
-            match_id = match['id']
-            if match['players']:
-                for player in match.get('players', []):
-                    player_slot = player['playerSlot']
-                    depth = 0
-                    if player['depthList']:
-                        for player_depth in player.get('depthList', []):
-                            player_depth['matchId-playerSlot'] = int(f'{match_id}{player_slot}')
-                            player_depth['depth'] = depth
-                            depth += 1
-                            player_depthlist_items.append(player_depth)
-                        player.pop('depthList')
-
-                    if player['blessings']:
-                        for player_blessing in player.get('blessings', []):
-                            player_blessing['matchId-playerSlot'] = int(f'{match_id}{player_slot}')
-                            player_blessings_items.append(player_blessing)
-                        player.pop('blessings')
-                    
-                    player_items.append(player)
-                match.pop('players')
-
-            depth = 0
-            if match['depthList']:
-                for depth_entry in match.get('depthList', []):
-                    if depth_entry['ascensionAbilities']:
-                        for ascensionability in depth_entry.get('ascensionAbilities', []):
-                            ascensionability['matchId-depth'] = int(f'{match_id}{depth:02}')
-                            ascensionabilities_items.append(ascensionability)
-                    depth_entry.pop('ascensionAbilities')
-
-                    depth_entry['matchId'] = match_id
-                    depth_entry['depth'] = depth
-                    depthlist_items.append(depth_entry)
-                    depth += 1
-                match.pop('depthList')
-
-            match_items.append(match)
-
-        #Insert match data
-        def batch_write(table, items):
-            with table.batch_writer() as batch:
-                for item in items:
-                    batch.put_item(Item=item)
-
-        batch_write(self.aghanim_matches, match_items)
-        batch_write(self.aghanim_players, player_items)
-        batch_write(self.aghanim_player_depthlist, player_depthlist_items)
-        batch_write(self.aghanim_player_blessings, player_blessings_items)
-        batch_write(self.aghanim_depthlist, depthlist_items)
-        batch_write(self.aghanim_ascensionabilities, ascensionabilities_items)
-
+        with self.output_table.batch_writer() as batch:
+            for match in self.matches:
+                batch.put_item(Item=match)
+                
         return self.matches
 
     def get_errors(self):

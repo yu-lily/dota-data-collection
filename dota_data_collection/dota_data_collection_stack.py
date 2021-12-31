@@ -238,7 +238,6 @@ class DotaDataCollectionStack(cdk.Stack):
         # players_table.grant_read_write_data(update_players_lambda)
         # players_table.grant_read_data(find_matchids_lambda)
         # matchid_table.grant_read_write_data(find_matchids_lambda)
-        #aghanim_matches_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(orchestrator_lambda)
         aghanim_query_window_table.grant_read_write_data(api_caller_lambda)
         aghanim_query_window_table.grant_read_data(queue_populator_lambda)

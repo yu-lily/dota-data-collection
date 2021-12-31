@@ -42,7 +42,6 @@ class APICaller:
     def graphql_query(self, query, variables, metadata) -> dict:
         endpoint = "https://api.stratz.com/graphql"
         headers = {'Authorization': 'Bearer ' + self.apikey}
-        print(self.apikey[:10])
         print(variables)
         r = requests.post(endpoint, json={'query': query , 'variables': variables}, headers=headers)
 

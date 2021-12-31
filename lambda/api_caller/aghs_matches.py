@@ -64,7 +64,7 @@ class AghsMatchesHandler(QueryHandler):
                     depth = 0
                     if player['depthList']:
                         for player_depth in player.get('depthList', []):
-                            player_depth['matchId-playerSlot'] = f'{match_id}{player_slot}'
+                            player_depth['matchId-playerSlot'] = int(f'{match_id}{player_slot}')
                             player_depth['depth'] = depth
                             depth += 1
                             player_depthlist_items.append(player_depth)
@@ -72,7 +72,7 @@ class AghsMatchesHandler(QueryHandler):
 
                     if player['blessings']:
                         for player_blessing in player.get('blessings', []):
-                            player_blessing['matchId-playerSlot'] = f'{match_id}{player_slot}'
+                            player_blessing['matchId-playerSlot'] = int(f'{match_id}{player_slot}')
                             player_blessings_items.append(player_blessing)
                         player.pop('blessings')
                     
@@ -84,7 +84,7 @@ class AghsMatchesHandler(QueryHandler):
                 for depth_entry in match.get('depthList', []):
                     if depth_entry['ascensionAbilities']:
                         for ascensionability in depth_entry.get('ascensionAbilities', []):
-                            ascensionability['matchId-depth'] = f'{match_id}{depth}'
+                            ascensionability['matchId-depth'] = int(f'{match_id}{depth.zfill(2)}')
                             ascensionabilities_items.append(ascensionability)
                     depth_entry.pop('ascensionAbilities')
 

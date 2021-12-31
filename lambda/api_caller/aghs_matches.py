@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 class AghsMatchesHandler(QueryHandler):
-    def __init__(self, ddb_resource, query_type, event, staging_queue, conn, cur) -> None:
+    def __init__(self, ddb_resource, query_type, event, sqs_resource, conn, cur) -> None:
         super().__init__(ddb_resource, query_type, event)
 
         #Load additional tables
@@ -15,7 +15,7 @@ class AghsMatchesHandler(QueryHandler):
         self.get_existing_log()
         self.reached_end = False
         
-        self.staging_queue = staging_queue
+        self.staging_queue = sqs_resource.get_queue_by_name(QueueName=os.environ["STAGING_QUEUE"])
 
         self.conn = conn
         self.cur = cur

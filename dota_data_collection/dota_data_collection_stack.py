@@ -32,7 +32,9 @@ class DotaDataCollectionStack(cdk.Stack):
         api_caller_queue = sqs.Queue(self, 'APICallerQueue',
             visibility_timeout=core.Duration.seconds(180),
         )
-
+        failure_queue = sqs.Queue(self, 'FailureQueue',
+            visibility_timeout=core.Duration.seconds(300),
+        )
         # Create a DynamoDB table
         players_table = ddb.Table(
             self, "PlayersTable",
@@ -120,6 +122,7 @@ class DotaDataCollectionStack(cdk.Stack):
 
             "STAGING_QUEUE": staging_queue.queue_name,
             "API_CALLER_QUEUE": api_caller_queue.queue_name,
+            "FAILURE_QUEUE": failure_queue.queue_name,
             
             "RDS_CREDS_NAME": RDS_SECRET_NAME,
             "AGHANIM_MATCHES_DB_ENDPOINT": aghanim_matches_db_proxy.endpoint,
@@ -212,6 +215,25 @@ class DotaDataCollectionStack(cdk.Stack):
             profiling=True,
         )
 
+        failure_repopulator_lambda = _lambda.Function(
+            self, "FailureRepopulatorLambda",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler='index.handler',
+            code=_lambda.Code.from_asset(
+                "lambda/failure_repopulator",
+                bundling=core.BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_8.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                    ],
+                ),
+            ),
+            environment={**LAMBDA_ENVS, **LAMBDA_FUNC_NAMES},
+            timeout=core.Duration.minutes(10),
+            profiling=True,
+        )
+
         # LAMBDA EVENTS
         # Attach api caller lambda to SQS queue
         api_caller_lambda.add_event_source(SqsEventSource(api_caller_queue,
@@ -238,6 +260,9 @@ class DotaDataCollectionStack(cdk.Stack):
         api_caller_queue.grant_consume_messages(api_caller_lambda)
         staging_queue.grant_send_messages(api_caller_lambda)
         staging_queue.grant_send_messages(queue_populator_lambda)
+        failure_queue.grant_send_messages(api_caller_lambda)
+        failure_queue.grant_consume_messages(failure_repopulator_lambda)
+
 
         #ALLOW FUNCTION CALLS
         #Allow the orchestrator function to call other functions

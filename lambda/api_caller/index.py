@@ -10,7 +10,7 @@ ddb_resource = boto3.resource('dynamodb')
 
 sqs = boto3.resource('sqs')
 staging_queue = sqs.get_queue_by_name(QueueName=os.environ["STAGING_QUEUE"])
-
+failure_queue = sqs_resource.get_queue_by_name(QueueName=os.environ["FAILURE_QUEUE"])
 
 session = boto3.session.Session()
 
@@ -48,14 +48,20 @@ def handler(event, context):
     errors = 0
 
     HandlerClass = choose_handler(query_type)
-    handler = HandlerClass(ddb_resource, query_type, event, staging_queue, conn, cur)
+    handler = HandlerClass(ddb_resource, query_type, event, sqs, conn, cur)
 
     handler.extract_vars()
-    handler.make_query()
+    try:
+        handler.make_query()
+    except Exception as e:
+        print(f'Error making API Call: {e}')
+        failure_queue.send_message(MessageBody=json.dumps(event))
+
     handler.write_results()
     handler.log_window()
     handler.queue_next_query()
     #Make API call
+
 
     
     errors += handler.get_errors()

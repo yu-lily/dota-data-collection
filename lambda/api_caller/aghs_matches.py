@@ -84,7 +84,7 @@ class AghsMatchesHandler(QueryHandler):
                 for depth_entry in match.get('depthList', []):
                     if depth_entry['ascensionAbilities']:
                         for ascensionability in depth_entry.get('ascensionAbilities', []):
-                            ascensionability['matchId-depth'] = int(f'{match_id}{depth.zfill(2)}')
+                            ascensionability['matchId-depth'] = int(f'{match_id}{depth:02}')
                             ascensionabilities_items.append(ascensionability)
                     depth_entry.pop('ascensionAbilities')
 

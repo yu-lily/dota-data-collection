@@ -195,6 +195,7 @@ class DotaDataCollectionStack(cdk.Stack):
         staging_queue.grant_send_messages(queue_populator_lambda)
         failure_queue.grant_send_messages(api_caller_lambda)
         failure_queue.grant_consume_messages(failure_repopulator_lambda)
+        api_caller_queue.grant_send_messages(failure_repopulator_lambda)
 
 
         #ALLOW FUNCTION CALLS

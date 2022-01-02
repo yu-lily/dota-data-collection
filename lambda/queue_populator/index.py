@@ -46,7 +46,7 @@ def handler(event, context):
         item = query_window_table.get_item(Key={'start_time': start_time, 'difficulty': DIFFICULTY})
         if 'Item' in item:
             print(item)
-            if item['Item']['reached_end'].lower() == 'true':
+            if item['Item']['reached_end']:
                 print(f'Window {start_time}-{start_time + WINDOW_SIZE} already handled')
                 start_time += WINDOW_SIZE
                 continue

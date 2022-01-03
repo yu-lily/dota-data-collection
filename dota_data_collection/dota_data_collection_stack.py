@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
     aws_secretsmanager as sm,
+    aws_route53 as route53,
     aws_ec2 as ec2,
     aws_rds as rds,
     aws_iam as iam,
@@ -32,6 +33,11 @@ class DotaDataCollectionStack(cdk.Stack):
         )
         failure_queue = sqs.Queue(self, 'FailureQueue',
             visibility_timeout=core.Duration.seconds(300),
+        )
+
+        # Route 53
+        route53.PublicHostedZone(self, "HostedZone",
+            zone_name="dota.science",
         )
 
         # DynamoDB tables

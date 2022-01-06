@@ -45,6 +45,11 @@ class APICaller:
         print(variables)
         r = requests.post(endpoint, json={'query': query , 'variables': variables}, headers=headers)
 
+        rl_s, rl_m, rl_h, rl_d = (r.headers['X-RateLimit-Remaining-Second'],
+        r.headers['X-RateLimit-Limit-Minute'],
+        r.headers['X-RateLimit-Limit-Hour'],
+        r.headers['X-RateLimit-Limit-Day'])
+
         #Log that the request was made
         ts = int(time.time())
         rand = random.randint(0, 999)
@@ -56,7 +61,11 @@ class APICaller:
             'logStream': metadata.log_stream,
             'queryType': metadata.query_type,
             'timestamp': ts,
-            'statusCode': r.status_code
+            'statusCode': r.status_code,
+            'rateLimitRemainingSecond': rl_s,
+            'rateLimitRemainingMinute': rl_m,
+            'rateLimitRemainingHour': rl_h,
+            'rateLimitRemainingDay': rl_d,
             }
         self.api_calls_table_client.put_item(Item=item)
         
